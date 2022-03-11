@@ -5,6 +5,7 @@ showCategories("radio", "#categoryDiv");
 setDateSelector();
 
 // Show the end view after submit
+//  (directly from html)
 //  Write on the db
 
 // Show the starting view with last values
@@ -12,3 +13,4 @@ setDateSelector();
 
 
 // Show the starting view after another response button
+//  (directly from html)
