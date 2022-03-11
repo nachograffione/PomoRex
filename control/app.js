@@ -1,11 +1,11 @@
-//Show the starting view
-//nested categories items based on db
+// Show the starting view
+//  nested categories items based on db
 
 showCategories("checkbox", "#categoryDiv");
 
 setDateSelector();
 
-//Manage checkbox selection
+// Manage checkbox selection
 
 function toggleSubcategories(evt) {
     const buttonState = evt.target.checked;
@@ -32,19 +32,19 @@ function manageCheckboxSelection() {
 
 manageCheckboxSelection();
 
-//Calculate 10 worker days before average
+// Calculate 10 worker days before average
 
 
-//Update average chart
+// Update average chart
 
 
-//Update 10 worker days before chart
+// Update 10 worker days before chart
 
 
-//Update last inputs list
+// Update last inputs list
 
 
-//Update month chart
+// Update month chart
 
 
-//Update charts after a user selection
+// Update charts after a user selection
