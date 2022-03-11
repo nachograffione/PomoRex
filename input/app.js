@@ -4,6 +4,9 @@
 showCategories("radio", "#categoryDiv");
 setDateSelector();
 
+
+//Manage radio selections
+
 //Show the end view after submit
     //Write on the db
 

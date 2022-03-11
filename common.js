@@ -13,71 +13,64 @@ function capitalize(str) {
 }
 
 
-function addButtonListItem(buttonType, buttonName, buttonId, hasSubcategories, targetDivId) {
-    //buttonType should be "radio" or "checkbox"
-
+function createHTMLOfCategoryButton(buttonType, buttonName, buttonId) {
     //create and set an item
     const button = document.createElement("input");
     button.setAttribute("type", buttonType);
-    button.setAttribute("id", buttonType + buttonId);
-
-
-    if (buttonType == "radio") {
-        //disable those which have subcategories
-        if (hasSubcategories) {
-            button.setAttribute("disabled", "true");
-        }
-        //link all radios
-        else {
-            button.setAttribute("name", "category");
-        }
-    }
+    button.setAttribute("id", buttonId);
 
     //create and set a label
     const label = document.createElement("label");
     label.innerHTML = buttonName;
-    label.setAttribute("for", buttonType + buttonId);
+    label.setAttribute("for", buttonId);
 
     //create and set the div which contains both
     const div = document.createElement("div");
     div.setAttribute("id", "div" + buttonId);
-    div.setAttribute("style", "margin-left:40px"); //temporaly
     div.appendChild(button);
     div.appendChild(label);
 
-    //pick the div where it will be added
-    const targetDiv = document.querySelector(targetDivId);
-    targetDiv.appendChild(div);
+    return div;
 }
 
+function createHTMLOfCategoriesArray(buttonType, array, firstButtonId) {
+    //create the array div
+    const arrayDiv = document.createElement("div");
+    arrayDiv.setAttribute("style", "margin-left:40px"); //temporaly
+    //for each item
+    for (let i = 0; i < array.length; i++) {
+        const item = array[i];
 
-function createHTMLOfCategoriesArray(buttonType) {
-    //buttonType should be "radio" or "checkbox"
+        const itemId = String(firstButtonId) + "." + String(i);
+        let itemDiv;
+        //if it's an array
+        if (Array.isArray(item)) {
+            //create a item div
+            itemDiv = document.createElement("div");
+            //add the first element to the item div
+            const button = createHTMLOfCategoryButton(buttonType, item[0], itemId);
+            itemDiv.appendChild(button);
 
-    //id system:
-    //main div: #categoryDiv
-    //categories and subcategories: buttonTypeNM and divNM
-    //  (N and M are indexes, i and j in the code)
-    for (let i = 0; i < categories.length; i++) {   //for each category
-        const category = categories[i];
-        if (Array.isArray(category)) {  //if it has subcategories
-            addButtonListItem(buttonType, category[0], String(i), true, "#categoryDiv");
-
-            const subcategories = category.slice(1);    //store subcategories
-            for (let j = 0; j < subcategories.length; j++) {    //for each subcategory
-                const subcategory = subcategories[j];
-                addButtonListItem(buttonType, subcategory, String(i) + "-" + String(j), false, "#div" + String(i));
-            }
+            //add childArray to the item div
+            const childArrayDiv = createHTMLOfCategoriesArray(buttonType, item.slice(1), itemId); //childArray = recursive call with slice
+            itemDiv.appendChild(childArrayDiv);
         }
         else {
-            addButtonListItem(buttonType, category, String(i), false, "#categoryDiv");
+            itemDiv = createHTMLOfCategoryButton(buttonType, array[i], itemId);
         }
+        //add the item div into the main div
+        arrayDiv.appendChild(itemDiv);
     }
+    return arrayDiv;
 }
 
 function showCategories(buttonType, targetDivId) {
     //buttonType have to be "radio" or "checkbox"
 
-    const categoriesHTML = createHTMLOfCategoriesArray(buttonType);
+    const categoriesHTML = createHTMLOfCategoriesArray(buttonType, categories, 0);
 
+    console.log(categoriesHTML);
+    //pick the div where it will be added
+    const targetDiv = document.querySelector(targetDivId);
+    targetDiv.appendChild(categoriesHTML);
 }
