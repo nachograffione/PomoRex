@@ -40,3 +40,48 @@ CREATE INDEX index_fk_pomo_category
     ON pomo(pomIdCategory);
 CREATE INDEX index_fk_pomo_subcategory
     ON pomo(pomIdSubcategory);
+
+
+CREATE FUNCTION chk_pomo
+	()
+	RETURNS TRIGGER
+	LANGUAGE plpgsql
+	AS
+	$$
+	BEGIN
+        IF (
+            -- These are 3 implications converted to conjunction by theorem
+            -- Those implications are:
+            --     If the pomo's category ISN'T referred by one or more subcategories,
+            --         then the subcategory is null
+            --     If the pomo's category is referred by one or more subcategories,
+            --         then the subcategory is not null
+            --     If the pomo's subcategory is not null,
+            --         then it belongs to the category
+            NOT(
+                pomIdCategory NOT IN (SELECT subcIdCategory FROM subcategory) AND
+                NOT (pomIdSubcategory IS NULL)) AND
+            NOT(
+                pomIdCategory IN (SELECT subcIdCategory FROM subcategory) AND
+                NOT (pomIdSubcategory IS NOT NULL)) AND
+            NOT(
+                pomIdSubcategory IS NOT NULL AND
+                NOT (pomIdCategory = (SELECT subcIdCategory
+                                        FROM subcategories
+                                        WHERE subcId = pomIdSubcategory)))
+        ) THEN
+            RETURN NEW;
+        ELSE
+            RETURN NULL;
+        END IF;
+	END;
+	$$;
+
+
+CREATE TRIGGER trg_pomo_ins_upd
+	BEFORE
+		INSERT OR
+        UPDATE OF pomIdCategory, pomIdSubcategory
+    ON pomo
+	FOR EACH ROW
+		EXECUTE PROCEDURE chk_pomo();
