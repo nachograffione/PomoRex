@@ -1,6 +1,6 @@
-DROP INDEX fk_subcategory_category_index;
-DROP INDEX fk_pomo_category_index;
-DROP INDEX fk_pomo_subcategory_index;
+DROP INDEX index_fk_subcategory_category;
+DROP INDEX index_fk_pomo_category;
+DROP INDEX index_fk_pomo_subcategory;
 
 DROP TABLE pomo;
 DROP TABLE subcategory;

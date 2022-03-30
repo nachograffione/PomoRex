@@ -20,7 +20,7 @@ CREATE TABLE subcategory (
     CONSTRAINT fk_subsubcategory_category  FOREIGN KEY (subcIdCategory)
         REFERENCES category (catId)
 );
-CREATE INDEX fk_subcategory_category_index
+CREATE INDEX index_fk_subcategory_category
     ON subcategory(subcIdCategory);
 
 
@@ -36,7 +36,7 @@ CREATE TABLE pomo (
     CONSTRAINT fk_pomo_subcategory  FOREIGN KEY (pomIdSubcategory)
         REFERENCES subcategory (subcId)
 );
-CREATE INDEX fk_pomo_category_index
+CREATE INDEX index_fk_pomo_category
     ON pomo(pomIdCategory);
-CREATE INDEX fk_pomo_subcategory_index
+CREATE INDEX index_fk_pomo_subcategory
     ON pomo(pomIdSubcategory);
