@@ -3,7 +3,7 @@
 
 CREATE TABLE category (
     catId      SERIAL,     -- == INT NOT NULL
-	catName    CHAR(30) NOT NULL,
+	catName    CHAR(40) NOT NULL,
 
     CONSTRAINT pk_category      PRIMARY KEY (catId),
     CONSTRAINT ak_category      UNIQUE (catName)
@@ -12,7 +12,7 @@ CREATE TABLE category (
 
 CREATE TABLE subcategory (
     subcId          SERIAL,     -- == INT NOT NULL
-	subcName        CHAR(30) NOT NULL,
+	subcName        CHAR(40) NOT NULL,
     subcIdCategory  INT NOT NULL,
 
     CONSTRAINT pk_subcategory              PRIMARY KEY (subcId),
