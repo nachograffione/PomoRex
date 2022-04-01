@@ -38,3 +38,25 @@ INSERT INTO subcategory
 -- Case 3
 INSERT INTO category
     VALUES (DEFAULT, 'Otros');
+
+-----------------------------------------------------------------
+-- Pomos
+
+-- Cases:
+--     1) A pomo with category and subcategory
+--     2) A pomo with only category
+
+-- Case 1
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022/03/01',
+            (SELECT catId FROM category
+                WHERE catName = 'Ingeniería'),
+            (SELECT subcId FROM subcategory
+                WHERE subcIdCategory = (SELECT catId FROM category
+                                        WHERE catName = 'Ingeniería') AND
+                subcName = 'Clases'));
+
+-- Case 2
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022/03/01',
+        (SELECT catId FROM category WHERE catName = 'Otros'));
