@@ -42,7 +42,7 @@ CREATE INDEX index_fk_pomo_subcategory
     ON pomo(pomIdSubcategory);
 
 
-CREATE FUNCTION chk_pomo
+CREATE OR REPLACE FUNCTION chk_pomo
 	()
 	RETURNS TRIGGER
 	LANGUAGE plpgsql
@@ -59,16 +59,16 @@ CREATE FUNCTION chk_pomo
             --     If the pomo's subcategory is not null,
             --         then it belongs to the category
             NOT(
-                pomIdCategory NOT IN (SELECT subcIdCategory FROM subcategory) AND
-                NOT (pomIdSubcategory IS NULL)) AND
+                NEW.pomIdCategory NOT IN (SELECT subcIdCategory FROM subcategory) AND
+                NOT (NEW.pomIdSubcategory IS NULL)) AND
             NOT(
-                pomIdCategory IN (SELECT subcIdCategory FROM subcategory) AND
-                NOT (pomIdSubcategory IS NOT NULL)) AND
+                NEW.pomIdCategory IN (SELECT subcIdCategory FROM subcategory) AND
+                NOT (NEW.pomIdSubcategory IS NOT NULL)) AND
             NOT(
-                pomIdSubcategory IS NOT NULL AND
-                NOT (pomIdCategory = (SELECT subcIdCategory
-                                        FROM subcategories
-                                        WHERE subcId = pomIdSubcategory)))
+                NEW.pomIdSubcategory IS NOT NULL AND
+                NOT (NEW.pomIdCategory = (SELECT subcIdCategory
+                                        FROM subcategory
+                                        WHERE subcId = NEW.pomIdSubcategory)))
         ) THEN
             RETURN NEW;
         ELSE
