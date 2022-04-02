@@ -49,30 +49,27 @@ CREATE OR REPLACE FUNCTION chk_pomo
 	AS
 	$$
 	BEGIN
-        IF (
-            -- These are 3 implications converted to conjunction by theorem
-            -- Those implications are:
-            --     If the pomo's category ISN'T referred by one or more subcategories,
-            --         then the subcategory is null
-            --     If the pomo's category is referred by one or more subcategories,
-            --         then the subcategory is not null
-            --     If the pomo's subcategory is not null,
-            --         then it belongs to the category
-            NOT(
-                NEW.pomIdCategory NOT IN (SELECT subcIdCategory FROM subcategory) AND
-                NOT (NEW.pomIdSubcategory IS NULL)) AND
-            NOT(
-                NEW.pomIdCategory IN (SELECT subcIdCategory FROM subcategory) AND
-                NOT (NEW.pomIdSubcategory IS NOT NULL)) AND
-            NOT(
-                NEW.pomIdSubcategory IS NOT NULL AND
-                NOT (NEW.pomIdCategory = (SELECT subcIdCategory
-                                        FROM subcategory
-                                        WHERE subcId = NEW.pomIdSubcategory)))
-        ) THEN
-            RETURN NEW;
-        ELSE
+	-- These are implications translated to conjunctions by theorems and logic operations
+		
+		-- The pomo's category is referred by one or more subcategories
+		-- if and only if the subcategory is not null
+        IF (NEW.pomIdCategory IN (SELECT subcIdCategory FROM subcategory) AND
+                NOT (NEW.pomIdSubcategory IS NOT NULL))
+			OR
+		   (NOT (NEW.pomIdCategory IN (SELECT subcIdCategory FROM subcategory)) AND
+                 NEW.pomIdSubcategory IS NOT NULL) THEN
+			RAISE NOTICE 'Insert/Update failed. Broken rule: The pomo''s category is referred by one or more subcategories if and only if the subcategory is not null.';
             RETURN NULL;
+		-- If the pomo's subcategory is not null,
+		-- then it belongs to the category
+        ELSIF (NEW.pomIdSubcategory IS NOT NULL AND
+                	NOT (NEW.pomIdCategory = (SELECT subcIdCategory
+                                        		FROM subcategory
+                                        		WHERE subcId = NEW.pomIdSubcategory))) THEN
+            RAISE NOTICE 'Insert/Update failed. Broken rule: If the pomo''s subcategory is not null, then it belongs to the category.';
+            RETURN NULL;
+        ELSE
+			RETURN NEW;
         END IF;
 	END;
 	$$;
