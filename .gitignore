@@ -1,1 +1,4 @@
 __design/
+server/node_modules/
+server/package-lock.json
+server/package.json
