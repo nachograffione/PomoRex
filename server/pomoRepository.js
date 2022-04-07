@@ -1,6 +1,17 @@
-function getCategories() {
+exports.getCategories = getCategories;
 
-    return // a list of categories objects, which has got a list of subcategories
+// Connect to db
+const pgp = require('pg-promise')();
+const db = pgp('postgres://postgres:nacho@localhost:5433/pomoRex');
+
+async function getCategories() {
+    // It returns a list of category objects, which has got a list of subcategories
+    //     Remember to call with await, instead you will recieve a pending promise
+    let categories = await db.any("SELECT * FROM category");
+    for (let category of categories) {
+        category.subcategories = await db.any("SELECT * FROM subcategory WHERE subcIdCategory = $1", [category.catid]);
+    };
+    return categories;
 }
 
 function getCategoriesMock() {
