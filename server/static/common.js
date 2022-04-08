@@ -1,4 +1,4 @@
-let categories = {};
+let categories = [];
 
 async function fetchCategories() {
     try {
@@ -85,7 +85,6 @@ function createHTMLOfCategoriesArray(buttonType) {
 async function showCategories(buttonType, targetDivId) {
     // buttonType have to be "radio" or "checkbox"
     categories = await fetchCategories();
-    console.log(categories);
     const categoriesHTML = createHTMLOfCategoriesArray(buttonType);
 
 }
