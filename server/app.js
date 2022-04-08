@@ -14,9 +14,10 @@ app.set("view engine", "ejs");  //it will do require("ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // routing
-app.use("/api/categories", (req, res, next) => {
+const pomoRepository = require("./pomoRepository");
+app.use("/api/categories", async (req, res, next) => {
     res.send({
-        // categories: 
+        categories: await pomoRepository.getCategories()
     });
 });
 
