@@ -4,12 +4,26 @@ exports.getCategories = getCategories;
 const pgp = require('pg-promise')();
 const db = pgp('postgres://postgres:nacho@localhost:5433/pomoRex');
 
+function adaptAttrNames(category) {
+    category["id"] = category["catid"];
+    delete category["catid"];
+    category["name"] = category["catname"];
+    delete category["catname"];
+    for (let subcategory of category.subcategories) {
+        subcategory["id"] = subcategory["subcid"];
+        delete subcategory["subcid"];
+        subcategory["name"] = subcategory["subcname"];
+        delete subcategory["subcname"];
+    }
+    return category;
+}
+
 async function getCategories() {
-    // It returns a list of category objects, which has got a list of subcategories
-    //     Remember to call with await, instead you will recieve a pending promise
+    // It does the composition and adapts the names removing prefixes
     let categories = await db.any("SELECT * FROM category");
     for (let category of categories) {
         category.subcategories = await db.any("SELECT * FROM subcategory WHERE subcIdCategory = $1", [category.catid]);
+        adaptAttrNames(category);
     };
     return categories;
 }
@@ -45,7 +59,7 @@ function getCategoriesMock() {
             ]
         },
         {
-            id: 2,
+            id: 3,
             name: "Ingenería",
             subcategories: [
                 {
@@ -59,7 +73,7 @@ function getCategoriesMock() {
             ]
         },
         {
-            id: 3,
+            id: 4,
             name: "Otros",
             subcategories: []
         }
