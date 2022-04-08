@@ -1,3 +1,15 @@
+let categories = {};
+
+async function fetchCategories() {
+    try {
+        const dataParsed = await axios.get("/api/categories");
+        return dataParsed.data.categories;
+    }
+    catch (error) {
+        console.log("Can't get categories");
+    }
+}
+
 // Add current date as default value and as max value
 // in the date selector
 function setDateSelector() {
@@ -55,29 +67,25 @@ function createHTMLOfCategoriesArray(buttonType) {
     // buttonType should be "radio" or "checkbox"
 
     // id system:
-    // main div: #categoryDiv
-    // categories and subcategories: buttonTypeNM and divNM
-    //  (N and M are indexes, i and j in the code)
-    for (let i = 0; i < categories.length; i++) {   //for each category
-        const category = categories[i];
-        if (Array.isArray(category)) {  //if it has subcategories
-            addButtonListItem(buttonType, category[0], String(i), true, "#categoryDiv");
-
-            const subcategories = category.slice(1);    //store subcategories
-            for (let j = 0; j < subcategories.length; j++) {    //for each subcategory
-                const subcategory = subcategories[j];
-                addButtonListItem(buttonType, subcategory, String(i) + "-" + String(j), false, "#div" + String(i));
+    //      main div: #categoryDiv
+    //      categories and subcategories: <buttonType><catId><subcId> and div<catId><subcId>
+    for (const category of categories) {
+        if (category.subcategories.length != 0) {
+            addButtonListItem(buttonType, category.name, String(category.id), true, "#categoryDiv");
+            for (const subcategory of category.subcategories) {
+                addButtonListItem(buttonType, subcategory.name, String(category.id) + String(subcategory.id), false, "#div" + String(category.id));
             }
         }
         else {
-            addButtonListItem(buttonType, category, String(i), false, "#categoryDiv");
+            addButtonListItem(buttonType, category.name, String(category.id), false, "#categoryDiv");
         }
     }
 }
 
-function showCategories(buttonType, targetDivId) {
+async function showCategories(buttonType, targetDivId) {
     // buttonType have to be "radio" or "checkbox"
-
+    categories = await fetchCategories();
+    console.log(categories);
     const categoriesHTML = createHTMLOfCategoriesArray(buttonType);
 
 }
