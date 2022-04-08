@@ -14,6 +14,12 @@ app.set("view engine", "ejs");  //it will do require("ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // routing
+app.use("/api/categories", (req, res, next) => {
+    res.send({
+        // categories: 
+    });
+});
+
 app.use("/", express.static(path.join(__dirname, "static/")));
 
 app.use("/", (req, res, next) => {
