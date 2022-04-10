@@ -32,6 +32,7 @@ function addButtonListItem(buttonType, buttonName, buttonId, hasSubcategories, t
     const button = document.createElement("input");
     button.setAttribute("type", buttonType);
     button.setAttribute("id", buttonType + buttonId);
+    button.setAttribute("value", buttonId);
 
 
     if (buttonType == "radio") {
