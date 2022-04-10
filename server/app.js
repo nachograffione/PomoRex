@@ -21,6 +21,12 @@ app.use("/api/categories", async (req, res, next) => {
     });
 });
 
+app.use(express.urlencoded({ extended: true }));
+app.use("/api/input", (req, res, next) => {
+    //to fill
+    next();
+});
+
 app.use("/", express.static(path.join(__dirname, "static/")));
 
 app.use("/", (req, res, next) => {
