@@ -1,7 +1,7 @@
 // Show the starting view
 //  nested categories items based on db
 
-showCategories("radio", "#categoryDiv");
+showCategories("radio", "categoryDiv");
 setDateSelector();
 
 // Show the end view after submit
