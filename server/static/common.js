@@ -2,7 +2,7 @@ let categories = [];
 
 async function fetchCategories() {
     try {
-        const dataParsed = await axios.get("/api/categories");
+        const dataParsed = await axios.get("/api/getCategories");
         return dataParsed.data.categories;
     }
     catch (error) {
