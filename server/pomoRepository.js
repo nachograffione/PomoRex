@@ -1,4 +1,5 @@
 exports.getCategories = getCategories;
+exports.insertPomo = insertPomo;
 
 // Connect to db
 const pgp = require('pg-promise')();
@@ -78,4 +79,9 @@ function getCategoriesMock() {
             subcategories: []
         }
     ]
+}
+
+async function insertPomo(catId, subcId, date) {
+    // date format: "yyyy/mm/dd"
+    return await db.none("INSERT INTO pomo VALUES (DEFAULT, $1, $2, $3)", [date, catId, subcId]);
 }
