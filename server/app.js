@@ -27,6 +27,9 @@ app.get("/input", (req, res, next) => {
 app.get("/submitted", (req, res, next) => {
     res.render("submitted.ejs");
 });
+app.get("/editLast", (req, res, next) => {
+    res.render("input.ejs");
+});
 //      api
 app.get("/api/getCategories", async (req, res, next) => {
     res.send({
