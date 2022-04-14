@@ -21,14 +21,14 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "static/")));
 //      pages
-app.get("/input", (req, res, next) => {
-    res.render("input.ejs");
+app.get("/insert", (req, res, next) => {
+    res.render("insertOrEditLast.ejs", { editLast: false });
 });
 app.get("/submitted", (req, res, next) => {
     res.render("submitted.ejs");
 });
 app.get("/editLast", (req, res, next) => {
-    res.render("input.ejs");
+    res.render("insertOrEditLast.ejs", { editLast: true });
 });
 //      api
 app.get("/api/getCategories", async (req, res, next) => {
