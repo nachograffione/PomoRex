@@ -36,8 +36,18 @@ app.get("/api/getCategories", async (req, res, next) => {
         categories: await pomoRepository.getCategories()
     });
 });
+app.get("/api/getLastInsert", async (req, res, next) => {
+    res.send({
+        pomo: await pomoRepository.getLastInsert()
+    });
+});
 app.post("/api/insertPomo", async (req, res, next) => {
     const [catId, subcId] = req.body.catAndSubc.split("-");
     pomoRepository.insertPomo(catId, subcId, req.body.date); //date's already came in the right format
+    res.redirect("/submitted");
+});
+app.post("/api/editLastPomo", async (req, res, next) => {
+    const [catId, subcId] = req.body.catAndSubc.split("-");
+    pomoRepository.editLastPomo(catId, subcId, req.body.date); //date's already came in the right format
     res.redirect("/submitted");
 });

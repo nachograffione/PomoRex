@@ -1,11 +1,13 @@
 exports.getCategories = getCategories;
 exports.insertPomo = insertPomo;
+exports.getLastInsert = getLastInsert;
+exports.editLastPomo = editLastPomo;
 
 // Connect to db
 const pgp = require('pg-promise')();
 const db = pgp('postgres://postgres:nacho@localhost:5433/pomoRex');
 
-function adaptAttrNames(category) {
+function adaptCategoryAttrNames(category) {
     category["id"] = category["catid"];
     delete category["catid"];
     category["name"] = category["catname"];
@@ -19,12 +21,24 @@ function adaptAttrNames(category) {
     return category;
 }
 
+function adaptPomoAttrNames(pomo) {
+    pomo["id"] = pomo["pomid"];
+    delete pomo["pomid"];
+    pomo["date"] = pomo["pomdate"];
+    delete pomo["pomdate"];
+    pomo["idCategory"] = pomo["pomidcategory"];
+    delete pomo["pomidcategory"];
+    pomo["idSubcategory"] = pomo["pomidsubcategory"];
+    delete pomo["pomidsubcategory"];
+    return pomo;
+}
+
 async function getCategories() {
     // It does the composition and adapts the names removing prefixes
     let categories = await db.any("SELECT * FROM category");
     for (let category of categories) {
         category.subcategories = await db.any("SELECT * FROM subcategory WHERE subcIdCategory = $1", [category.catid]);
-        adaptAttrNames(category);
+        adaptCategoryAttrNames(category);
     };
     return categories;
 }
@@ -84,4 +98,21 @@ function getCategoriesMock() {
 async function insertPomo(catId, subcId, date) {
     // date format: "yyyy/mm/dd"
     return await db.none("INSERT INTO pomo VALUES (DEFAULT, $1, $2, $3)", [date, catId, subcId]);
+}
+
+async function getLastInsert() {
+    // It gets from db and adapts the names removing prefixes
+
+    // by id, because you want the last inserted, that can has got an older date
+    let pomo = await db.one("SELECT * FROM pomo ORDER BY pomid DESC LIMIT 1");
+    adaptPomoAttrNames(pomo);
+
+    // remove timestamp
+    pomo.date = pomo.date.toISOString().slice(0, 10);;
+    return pomo;
+}
+
+async function editLastPomo(catId, subcId, date) {
+    // date format: "yyyy/mm/dd"
+    return await db.none("UPDATE pomo SET pomidcategory = $1, pomidsubcategory = $2, pomdate = $3 WHERE pomid = (SELECT pomid FROM pomo ORDER BY pomid DESC LIMIT 1)", [catId, subcId, date]);
 }

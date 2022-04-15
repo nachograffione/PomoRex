@@ -1,14 +1,19 @@
 // Show the starting view
 //  nested categories items based on db
 
-function fetchLastInsert() {
-    // MAKE THE QUERY!
-    return { catId: 2, subcId: 3, date: "2022-01-01" };
+async function fetchLastInsert() {
+    try {
+        const dataParsed = await axios.get("/api/getLastInsert");
+        return dataParsed.data.pomo;
+    }
+    catch (error) {
+        console.log("Can't get categories");
+    }
 }
 
-function setLastInsertAsActive() {
-    const lastInsert = fetchLastInsert();
-    const button = document.querySelector("#" + makeHTMLElementId("radio", lastInsert.catId, lastInsert.subcId));
+async function setLastInsertAsActive() {
+    const lastInsert = await fetchLastInsert();
+    const button = document.querySelector("#" + makeHTMLElementId("radio", lastInsert.idCategory, lastInsert.idSubcategory));
     button.setAttribute("checked", "true");
     const dateSelector = document.querySelector("#dateSelector");
     dateSelector.setAttribute("value", lastInsert.date);
@@ -16,8 +21,7 @@ function setLastInsertAsActive() {
 
 async function showCategoriesWithLastInsertAsActive() {
     await showCategories("radio", "categoryDiv");
-    setLastInsertAsActive();
-    setDateSelector();
+    await setLastInsertAsActive();
 }
 showCategoriesWithLastInsertAsActive();
 
