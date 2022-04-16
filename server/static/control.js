@@ -1,7 +1,7 @@
 // Show the starting view
 //  nested categories items based on db
 
-showCategories("checkbox", "#categoryDiv");
+showCategories("checkbox", "categoryDiv");
 
 setDateSelector();
 
