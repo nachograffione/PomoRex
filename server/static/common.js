@@ -34,9 +34,21 @@ function makeCatAndSubcId(catId, subcId = undefined) {
     }
 }
 
+function getFromCatAndSubcId(id) {
+    // format: <catId>[-<subcId>]
+    let [catId, subcId] = id.split("-");    // subcId will be undefined if there's no subc
+    return { catId, subcId };
+}
+
 function makeHTMLElementId(element, catId, subcId = undefined) {
     // format: <HTMLElement>_<catAndSubcId>
     return element + "_" + makeCatAndSubcId(catId, subcId);
+}
+
+function getFromHTMLElementId(id) {
+    // format: <HTMLElement>_<catAndSubcId>
+    let [element, catAndSubcId] = id.split("_");
+    return { element: element, ...getFromCatAndSubcId(catAndSubcId) };
 }
 
 function createLabel(labelText, buttonId) {
