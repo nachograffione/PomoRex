@@ -7,30 +7,28 @@ setDateSelector();
 
 // Manage checkbox selection
 
-function toggleSubcategories(evt) {
+function checkboxSelectionHandler(evt) {
+    // It toggles the subcategories of the category that was toggled
     const buttonState = evt.target.checked;
-    let buttonId = evt.target.getAttribute("id");
-    buttonId = buttonId.slice(-1);
-    buttonId = parseInt(buttonId);
-
-    const subcategories = categories[buttonId].slice(1);
-    for (let j = 0; j < subcategories.length; j++) {
-        const subcatButton = document.querySelector("#checkbox" + String(buttonId) + "-" + String(j));
-        subcatButton.checked = buttonState;
-    }
-}
-
-function manageCheckboxSelection() {
-    for (let i = 0; i < categories.length; i++) {
-        const category = categories[i];
-        if (Array.isArray(category)) {  //if the category has subcategories
-            const button = document.querySelector("#checkbox" + String(i));
-            button.addEventListener("input", toggleSubcategories);
+    const toggledCatId = getFromHTMLElementId(evt.target.getAttribute("id")).catId;
+    for (const checkbox of document.querySelectorAll("input[type=checkbox]")) {
+        if (getFromHTMLElementId(checkbox.getAttribute("id")).catId == toggledCatId) {
+            checkbox.checked = buttonState;
         }
     }
 }
 
-manageCheckboxSelection();
+async function addListenersToSubcatButtons() {
+    categories = await fetchCategories();
+    for (const category of categories) {
+        if (category.subcategories.length != 0) {
+            const button = document.querySelector("#" + makeHTMLElementId("checkbox", category.id, undefined));
+            button.addEventListener("input", checkboxSelectionHandler);
+        }
+    }
+}
+
+addListenersToSubcatButtons();
 
 // Calculate 10 worker days before average
 
