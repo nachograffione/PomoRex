@@ -30,6 +30,9 @@ app.get("/submitted", (req, res, next) => {
 app.get("/editLast", (req, res, next) => {
     res.render("insertOrEditLast.ejs", { editLast: true });
 });
+app.get("/control", (req, res, next) => {
+    res.render("control.ejs");
+});
 //      api
 app.get("/api/getCategories", async (req, res, next) => {
     res.send({
