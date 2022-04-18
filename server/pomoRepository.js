@@ -2,6 +2,7 @@ exports.getCategories = getCategories;
 exports.insertPomo = insertPomo;
 exports.getLastInsert = getLastInsert;
 exports.editLastPomo = editLastPomo;
+exports.getMonth = getMonth;
 
 // Connect to db
 const pgp = require('pg-promise')();
@@ -115,4 +116,9 @@ async function getLastInsert() {
 async function editLastPomo(catId, subcId, date) {
     // date format: "yyyy/mm/dd"
     return await db.none("UPDATE pomo SET pomidcategory = $1, pomidsubcategory = $2, pomdate = $3 WHERE pomid = (SELECT pomid FROM pomo ORDER BY pomid DESC LIMIT 1)", [catId, subcId, date]);
+}
+
+async function getMonth(month) {
+    // The count parsing is because pg returns a bigint for columns with COUNT, and it is converted to an unexpected string since is unsoported by node or pg-promise or idk which one
+    return await db.any("SELECT date_part('day', pomdate) AS day, COUNT(pomid)::INT AS qty FROM pomo WHERE date_part('month', pomdate) = $1 GROUP BY date_part('day', pomdate);", [month]);
 }

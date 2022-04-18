@@ -44,6 +44,11 @@ app.get("/api/getLastInsert", async (req, res, next) => {
         pomo: await pomoRepository.getLastInsert()
     });
 });
+app.get("/api/getMonth", async (req, res, next) => {
+    res.send({
+        month: await pomoRepository.getMonth(req.query.month)
+    });
+});
 app.post("/api/insertPomo", async (req, res, next) => {
     const [catId, subcId] = req.body.catAndSubc.split("-");
     pomoRepository.insertPomo(catId, subcId, req.body.date); //date's already came in the right format

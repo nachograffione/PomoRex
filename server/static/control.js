@@ -43,6 +43,17 @@ addListenersToSubcatButtons();
 
 
 // Update month chart
+async function fetchMonth(month) {
+    try {
+        const dataParsed = await axios.get("/api/getMonth", { params: { month: month } });
+        console.log(dataParsed.data.month);
+        return dataParsed.data.month;
+    }
+    catch (error) {
+        console.log("Can't get month");
+    }
+}
 
+fetchMonth(4);
 
 // Update charts after a user selection
