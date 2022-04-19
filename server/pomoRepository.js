@@ -8,20 +8,6 @@ exports.getMonth = getMonth;
 const pgp = require('pg-promise')();
 const db = pgp('postgres://postgres:nacho@localhost:5433/pomoRex');
 
-function adaptCategoryAttrNames(category) {
-    category["id"] = category["catid"];
-    delete category["catid"];
-    category["name"] = category["catname"];
-    delete category["catname"];
-    for (let subcategory of category.subcategories) {
-        subcategory["id"] = subcategory["subcid"];
-        delete subcategory["subcid"];
-        subcategory["name"] = subcategory["subcname"];
-        delete subcategory["subcname"];
-    }
-    return category;
-}
-
 function adaptPomoAttrNames(pomo) {
     pomo["id"] = pomo["pomid"];
     delete pomo["pomid"];
@@ -35,11 +21,39 @@ function adaptPomoAttrNames(pomo) {
 }
 
 async function getCategories() {
+    let categories = [];
+
+    // Leaves are subcategories (with their category) or categories without subcategories
+    // leaves important format:
+    //      it contains objects with pairs category-subcategory (id and name for each one)
+    //      they are ordered by their ids
+    const leaves = await db.any(
+        "SELECT catid, catname, subcid, subcname FROM category, subcategory \
+            WHERE subcidcategory = catid \
+            UNION SELECT catid, catname, null, null FROM category \
+                WHERE catid NOT IN (SELECT DISTINCT subcidcategory FROM subcategory) \
+            ORDER BY catid, subcid");
+
     // It does the composition and adapts the names removing prefixes
-    let categories = await db.any("SELECT * FROM category");
-    for (let category of categories) {
-        category.subcategories = await db.any("SELECT * FROM subcategory WHERE subcIdCategory = $1", [category.catid]);
-        adaptCategoryAttrNames(category);
+    // WATCH OUT! This wierd loop only works if the query follows the ids order
+    let i = 0;
+    while (i < leaves.length) {
+        // Make the category
+        let category = {
+            id: leaves[i].catid,
+            name: leaves[i].catname,
+            subcategories: []
+        };
+        // Fill with subcategories
+        while (leaves[i].catid == category.id && leaves[i].subcid != null) {
+            category.subcategories.push({
+                id: leaves[i].subcid,
+                name: leaves[i].subcname
+            });
+            i++;
+        }
+        categories.push(category);
+        i++;
     };
     return categories;
 }
