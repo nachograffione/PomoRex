@@ -43,15 +43,19 @@ async function getCategories() {
             subcategories: []
         };
         // Fill with subcategories
-        while (leaves[i].catid == category.id && leaves[i].subcid != null) {
-            category.subcategories.push({
-                id: leaves[i].subcid,
-                name: leaves[i].subcname
-            });
+        if (leaves[i].subcid != null) {
+            while (leaves[i].catid == category.id && leaves[i].subcid != null) {
+                category.subcategories.push({
+                    id: leaves[i].subcid,
+                    name: leaves[i].subcname
+                });
+                i++;
+            }
+        }
+        else {
             i++;
         }
         categories.push(category);
-        i++;
     };
     return categories;
 }
