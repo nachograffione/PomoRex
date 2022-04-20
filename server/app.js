@@ -45,9 +45,28 @@ app.get("/api/getLastInsert", async (req, res, next) => {
     });
 });
 app.get("/api/getMonth", async (req, res, next) => {
-    res.send({
-        month: await pomoRepository.getMonth(req.query.month)
-    });
+    const firstDay = new Date(req.query.year, req.query.month - 1, 1); //month-1 because it needs monthIndex (from 0 to 11)
+    const lastDay = new Date(req.query.year, req.query.month, 0);
+    const categories = JSON.parse(req.query.categories).categories;
+    let pomos = [];
+    for (const category of categories) {
+        if (category.subcategories.length != 0) {
+            for (const subcategory of category.subcategories) {
+                pomos.push({
+                    category: category,
+                    subcategory: subcategory,
+                    pomos: await pomoRepository.getPomosQty(firstDay, lastDay, category.id, subcategory.id)
+                });
+            }
+        }
+        else {
+            pomos.push({
+                category: category,
+                pomos: await pomoRepository.getPomosQty(firstDay, lastDay, category.id)
+            });
+        }
+    }
+    res.send(pomos);
 });
 app.post("/api/insertPomo", async (req, res, next) => {
     const [catId, subcId] = req.body.catAndSubc.split("-");

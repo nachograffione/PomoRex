@@ -2,7 +2,7 @@ exports.getCategories = getCategories;
 exports.insertPomo = insertPomo;
 exports.getLastInsert = getLastInsert;
 exports.editLastPomo = editLastPomo;
-exports.getMonth = getMonth;
+exports.getPomosQty = getPomosQty;
 
 // Connect to db
 const pgp = require('pg-promise')();
@@ -24,9 +24,7 @@ async function getCategories() {
     let categories = [];
 
     // Leaves are subcategories (with their category) or categories without subcategories
-    // leaves important format:
-    //      it contains objects with pairs category-subcategory (id and name for each one)
-    //      they are ordered by their ids
+    // They are ordered by their ids, and is important for the loop below
     const leaves = await db.any(
         "SELECT catid, catname, subcid, subcname FROM category, subcategory \
             WHERE subcidcategory = catid \
@@ -135,9 +133,19 @@ async function editLastPomo(catId, subcId, date) {
             WHERE pomid = (SELECT pomid FROM pomo ORDER BY pomid DESC LIMIT 1)", [catId, subcId, date]);
 }
 
-async function getMonth(month) {
-    // The count parsing is because pg returns a bigint for columns with COUNT, and it is converted to an unexpected string since is unsoported by node or pg-promise or idk which one
-    return await db.any(
-        "SELECT date_part('day', pomdate) AS day, COUNT(pomid)::INT AS qty FROM pomo \
-            WHERE date_part('month', pomdate) = $1 GROUP BY date_part('day', pomdate)", [month]);
+async function getPomosQty(dateFrom, dateTo, categoryId, subcategoryId = undefined) {
+    // The count parsing is because pg returns a bigint for columns with COUNT,
+    // and it is converted to an unexpected string since is unsoported by node or pg-promise or idk which one
+    if (subcategoryId != undefined) {
+        return await db.any(
+            "SELECT date_part('day', pomdate) AS day, COUNT(pomid)::INT AS qty FROM pomo \
+            WHERE pomdate >= $1 AND pomdate <= $2 AND pomidcategory = $3 AND pomidsubcategory = $4 \
+            GROUP BY date_part('day', pomdate)", [dateFrom, dateTo, categoryId, subcategoryId]);
+    }
+    else {
+        return await db.any(
+            "SELECT date_part('day', pomdate) AS day, COUNT(pomid)::INT AS qty FROM pomo \
+            WHERE pomdate >= $1 AND pomdate <= $2 AND pomidcategory = $3 \
+            GROUP BY date_part('day', pomdate)", [dateFrom, dateTo, categoryId]);
+    }
 }

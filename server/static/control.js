@@ -43,17 +43,33 @@ addListenersToSubcatButtons();
 
 
 // Update month chart
-async function fetchMonth(month) {
-    try {
-        const dataParsed = await axios.get("/api/getMonth", { params: { month: month } });
-        console.log(dataParsed.data.month);
-        return dataParsed.data.month;
-    }
-    catch (error) {
-        console.log("Can't get month");
-    }
+function getActiveCategories() {
+    return {
+        categories: [
+            {
+                id: 3,
+                name: "Ingenería",
+                subcategories: [
+                    {
+                        id: 5,
+                        name: "Clases",
+                    }
+                ]
+            },
+            {
+                id: 4,
+                name: "Otros",
+                subcategories: []
+            }
+        ]
+    };
+}
+async function fetchMonth(month, year) {
+    const dataParsed = await axios.get("/api/getMonth", { params: { month: month, year: year, categories: getActiveCategories() } });
+    console.log("pomos ", dataParsed.data);
+    return dataParsed.data;
 }
 
-fetchMonth(4);
+fetchMonth(4, 2022);
 
 // Update charts after a user selection
