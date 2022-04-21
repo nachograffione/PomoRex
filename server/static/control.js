@@ -1,6 +1,8 @@
 // Show the starting view
 //  nested categories items based on db
 
+let monthChart = undefined;
+
 showCategories("checkbox", "categoryDiv");
 
 setDateSelector();
@@ -43,29 +45,72 @@ addListenersToSubcatButtons();
 
 
 // Update month chart
-function getActiveCategories() {
-    return {
-        categories: [
-            {
-                id: 3,
-                name: "Ingenería",
-                subcategories: [
-                    {
-                        id: 5,
-                        name: "Clases",
-                    }
-                ]
-            },
-            {
-                id: 4,
-                name: "Otros",
-                subcategories: []
+async function getActiveCategories() {
+    const categories = await fetchCategories();
+    let activeCategories = [];
+    const buttons = document.querySelectorAll("input[type=checkbox]");
+    for (const button of buttons) {
+        const completeId = button.getAttribute("id");
+        if (button.checked) {
+            // if it's a category
+            if (!completeId.includes("-")) {
+                const catId = parseInt(completeId.slice(completeId.indexOf("_") + 1));
+                // add category
+                const category = JSON.parse(JSON.stringify(categories.find((cat) => { return cat.id == catId })));
+                category.subcategories = []; //Clean subcategories
+                activeCategories.push(category);
             }
-        ]
+            else {
+                // add category
+                const catId = parseInt(completeId.slice(completeId.indexOf("_") + 1, completeId.indexOf("-")));
+                if (activeCategories.find((cat) => { return cat.id == catId }) == undefined) {
+                    const category = JSON.parse(JSON.stringify(categories.find((cat) => { return cat.id == catId })));
+                    category.subcategories = []; //Clean subcategories
+                    activeCategories.push(category);
+                }
+
+                const subcId = parseInt(completeId.slice(completeId.indexOf("-") + 1));
+                // find category
+                const category = JSON.parse(JSON.stringify(categories.find((cat) => { return cat.id == catId })));
+                const subcategory = JSON.parse(JSON.stringify(category.subcategories.find((subc) => { return subc.id == subcId })));
+                const addedCategory = activeCategories.find((cat) => { return cat.id == catId });
+                addedCategory.subcategories.push(subcategory);
+            }
+        }
+    }
+    return {
+        categories: activeCategories
+        // [
+        //     {
+        //         id: 3,
+        //         name: "Ingenería",
+        //         subcategories: [
+        //             {
+        //                 id: 5,
+        //                 name: "Clases",
+        //             }
+        //         ]
+        //     },
+        //     {
+        //         id: 4,
+        //         name: "Otros",
+        //         subcategories: []
+        //     }
+        // ]
     };
 }
+
+function addFormListener() {
+    const form = document.querySelector("#categoriesForm");
+    form.addEventListener("change", () => {
+        setTimeout(createMonthChart, 1000, 4, 2022); // little delay for waiting the checkbox's states
+    });
+}
+
+addFormListener();
+
 async function fetchMonth(month, year) {
-    const dataParsed = await axios.get("/api/getMonth", { params: { month: month, year: year, categories: getActiveCategories() } });
+    const dataParsed = await axios.get("/api/getMonth", { params: { month: month, year: year, categories: await getActiveCategories() } });
     return dataParsed.data;
 }
 
@@ -110,7 +155,6 @@ async function makeDatasetsMonth(month, year) {
         dataset.backgroundColor = colors[pomosMonth.indexOf(item)];
         datasets.push(dataset);
     }
-    console.log(datasets);
     return datasets;
 }
 
@@ -146,15 +190,22 @@ async function createMonthChart(month, year) {
             }
         }
     };
-
-    const myChart = new Chart(
+    if (monthChart != undefined) {
+        monthChart.destroy();
+    }
+    monthChart = new Chart(
         document.querySelector("#monthChartCanva"),
         {
             type: "bar",
-            data: data
+            data: data,
+            options: {
+                plugins: {
+                    legend: false
+                }
+            }
         }
     );
 }
 
-createMonthChart(4, 2022);
+
 // Update charts after a user selection
