@@ -1,5 +1,4 @@
 ﻿DELETE FROM pomo;
-DELETE FROM subcategory;
+DELETE FROM catGr;
+DELETE FROM groupOfCats;
 DELETE FROM category;
-
-
