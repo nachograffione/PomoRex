@@ -2,45 +2,45 @@
 
 
 CREATE TABLE category (
-    catId      SERIAL,     -- == INT NOT NULL
-	catName    VARCHAR(40) NOT NULL,
+    id      SERIAL,     -- == INT NOT NULL
+	name    VARCHAR(40) NOT NULL,
 
-    CONSTRAINT pk_category      PRIMARY KEY (catId),
-    CONSTRAINT ak_category      UNIQUE (catName)
+    CONSTRAINT pk_category      PRIMARY KEY (id),
+    CONSTRAINT ak_category      UNIQUE (name)
 );
 
+-- I have to name like this because i cant't use group, set, class or type
+CREATE TABLE groupOfCats (
+    id          SERIAL,     -- == INT NOT NULL
+	name        VARCHAR(40) NOT NULL,
 
-CREATE TABLE set (
-    setId          SERIAL,     -- == INT NOT NULL
-	setName        VARCHAR(40) NOT NULL,
-
-    CONSTRAINT pk_set                    PRIMARY KEY (setId),
-    CONSTRAINT ak_set                    UNIQUE (setName)
+    CONSTRAINT pk_groupOfCats                    PRIMARY KEY (id),
+    CONSTRAINT ak_groupOfCats                    UNIQUE (name)
 );
 
-CREATE TABLE catSet (
+CREATE TABLE catGr (
     catId     INT NOT NULL,
-    setId   INT NOT NULL,
+    grId      INT NOT NULL,
 
-    CONSTRAINT fk_catSet_category  FOREIGN KEY (catId)
-        REFERENCES category (catId),
-    CONSTRAINT fk_catSet_set  FOREIGN KEY (setId)
-        REFERENCES set (setId)
+    CONSTRAINT fk_catGr_category  FOREIGN KEY (catId)
+        REFERENCES category (id),
+    CONSTRAINT fk_catGr_groupOfCats  FOREIGN KEY (grId)
+        REFERENCES groupOfCats (id)
 );
-CREATE INDEX index_fk_catSet_category
-    ON catSet (catId);
-CREATE INDEX index_fk_catSet_set
-    ON catSet (setId);
+CREATE INDEX index_fk_catGr_category
+    ON catGr (catId);
+CREATE INDEX index_fk_catGr_groupOfCats
+    ON catGr (grId);
 
 
 CREATE TABLE pomo (
-    pomId              SERIAL,     -- == INT NOT NULL
-	pomDatetime        TIMESTAMP NOT NULL,
-    pomIdCategory      INT NOT NULL,
+    id              SERIAL,     -- == INT NOT NULL
+	datetime        TIMESTAMP NOT NULL,
+    catId           INT NOT NULL,
 
-    CONSTRAINT pk_pomo              PRIMARY KEY (pomId),
-    CONSTRAINT fk_pomo_category  FOREIGN KEY (pomIdCategory)
-        REFERENCES category (catId)
+    CONSTRAINT pk_pomo              PRIMARY KEY (id),
+    CONSTRAINT fk_pomo_category  FOREIGN KEY (catId)
+        REFERENCES category (id)
 );
 CREATE INDEX index_fk_pomo_category
-    ON pomo(pomIdCategory);
+    ON pomo(catId);
