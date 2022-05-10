@@ -33,48 +33,62 @@ app.get("/editLast", (req, res, next) => {
 app.get("/control", (req, res, next) => {
     res.render("control.ejs");
 });
-//      api
-app.get("/api/getCategories", async (req, res, next) => {
+// api
+//      get
+app.get("/api/categories", async (req, res, next) => {
+    // params: req.query.groups
     res.send({
-        categories: await pomoRepository.getCategories()
+        // to fill
     });
 });
-app.get("/api/getLastInsert", async (req, res, next) => {
+app.get("/api/categories/:id", async (req, res, next) => {
+    // params: id
     res.send({
-        pomo: await pomoRepository.getLastInsert()
+        // to fill
     });
 });
-app.get("/api/getMonth", async (req, res, next) => {
-    const firstDay = new Date(req.query.year, req.query.month - 1, 1); //month-1 because it needs monthIndex (from 0 to 11)
-    const lastDay = new Date(req.query.year, req.query.month, 0);
-    const categories = JSON.parse(req.query.categories).categories;
-    let pomos = [];
-    for (const category of categories) {
-        if (category.subcategories.length != 0) {
-            for (const subcategory of category.subcategories) {
-                pomos.push({
-                    category: category,
-                    subcategory: subcategory,
-                    pomos: await pomoRepository.getPomosQty(firstDay, lastDay, category.id, subcategory.id)
-                });
-            }
-        }
-        else {
-            pomos.push({
-                category: category,
-                pomos: await pomoRepository.getPomosQty(firstDay, lastDay, category.id)
-            });
-        }
-    }
-    res.send(pomos);
+app.get("/api/pomos", async (req, res, next) => {
+    // params: req.query.lastAmount, req.query.dateFrom, req.query.dateTo
+    res.send({
+        // to fill
+    });
 });
-app.post("/api/insertPomo", async (req, res, next) => {
-    const [catId, subcId] = req.body.catAndSubc.split("-");
-    pomoRepository.insertPomo(catId, subcId, req.body.date); //date's already came in the right format
-    res.redirect("/submitted");
+app.get("/api/pomos/:id", async (req, res, next) => {
+    // params: id
+    res.send({
+        // to fill
+    });
 });
-app.post("/api/editLastPomo", async (req, res, next) => {
-    const [catId, subcId] = req.body.catAndSubc.split("-");
-    pomoRepository.editLastPomo(catId, subcId, req.body.date); //date's already came in the right format
-    res.redirect("/submitted");
+app.get("/api/aggregations/pomos-quantities", async (req, res, next) => {
+    // params: req.query.lastAmount, req.query.dateFrom, req.query.dateTo
+    res.send({
+        // to fill
+    });
+});
+app.get("/api/aggregations/pomos-averages", async (req, res, next) => {
+    // params: req.query.lastAmount, req.query.dateFrom, req.query.dateTo
+    res.send({
+        // to fill
+    });
+});
+//      post
+app.post("/api/categories", async (req, res, next) => {
+    // params: req.body.name
+});
+app.post("/api/pomos", async (req, res, next) => {
+    // params: req.body.datetime, req.body.catId
+});
+//      patch
+app.patch("/api/categories/:id", async (req, res, next) => {
+    // params: id, req.body.newName
+});
+app.patch("/api/pomos/:id", async (req, res, next) => {
+    // params: id, req.body.newDatetime, req.body.newCatId
+});
+//      delete
+app.delete("/api/categories/:id", async (req, res, next) => {
+    // params: id
+});
+app.delete("/api/pomos/:id", async (req, res, next) => {
+    // params: id
 });
