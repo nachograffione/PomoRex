@@ -1,9 +1,23 @@
-exports.pomoRepository = pomoRepository;
+exports.PomoRepository = PomoRepository;
 
-class pomoRepository {
+// sequelize init
+const { Sequelize, DataTypes } = require("sequelize");
+const sequelize = new Sequelize(
+    "postgres://postgres:nacho@localhost:5433/pomoRex",
+    {
+        timestamps: true,
+        define: {
+            freezeTableName: true
+        }
+    }
+);
+// sequelize-auto init
+const initModels = require("./models/init-models");
+const models = initModels(sequelize);
+
+
+class PomoRepository {
     constructor() {
-        // Connect to db
-        const pgp = require('pg-promise')();
-        const db = pgp('postgres://postgres:nacho@localhost:5433/pomoRex');
+
     }
 }
