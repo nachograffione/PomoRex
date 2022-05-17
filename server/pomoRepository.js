@@ -18,6 +18,20 @@ class PomoRepository {
         // sequelize-auto init
         this.models = initModels(this.sequelize);
     }
+
+    async getCategories(groups) {
+        const results = await this.sequelize.query(
+            "SELECT * FROM category WHERE \
+                id IN (SELECT cat_id FROM cat_gr WHERE \
+                        gr_id IN (:groups))",
+            {
+                replacements: {
+                    groups: groups
+                },
+                type: QueryTypes.SELECT
+            });
+        return results;
+    }
 }
 
 exports.PomoRepository = PomoRepository;
