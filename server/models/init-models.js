@@ -1,27 +1,27 @@
 var DataTypes = require("sequelize").DataTypes;
-var _category = require("./category");
-var _catgr = require("./catgr");
-var _groupofcats = require("./groupofcats");
-var _pomo = require("./pomo");
+var _CatGr = require("./CatGr");
+var _Category = require("./Category");
+var _GroupOfCats = require("./GroupOfCats");
+var _Pomo = require("./Pomo");
 
 function initModels(sequelize) {
-  var category = _category(sequelize, DataTypes);
-  var catgr = _catgr(sequelize, DataTypes);
-  var groupofcats = _groupofcats(sequelize, DataTypes);
-  var pomo = _pomo(sequelize, DataTypes);
+  var CatGr = _CatGr(sequelize, DataTypes);
+  var Category = _Category(sequelize, DataTypes);
+  var GroupOfCats = _GroupOfCats(sequelize, DataTypes);
+  var Pomo = _Pomo(sequelize, DataTypes);
 
-  catgr.belongsTo(category, { as: "cat", foreignKey: "catid"});
-  category.hasMany(catgr, { as: "catgrs", foreignKey: "catid"});
-  pomo.belongsTo(category, { as: "cat", foreignKey: "catid"});
-  category.hasMany(pomo, { as: "pomos", foreignKey: "catid"});
-  catgr.belongsTo(groupofcats, { as: "gr", foreignKey: "grid"});
-  groupofcats.hasMany(catgr, { as: "catgrs", foreignKey: "grid"});
+  CatGr.belongsTo(Category, { as: "cat", foreignKey: "cat_id"});
+  Category.hasMany(CatGr, { as: "cat_grs", foreignKey: "cat_id"});
+  Pomo.belongsTo(Category, { as: "cat", foreignKey: "cat_id"});
+  Category.hasMany(Pomo, { as: "pomos", foreignKey: "cat_id"});
+  CatGr.belongsTo(GroupOfCats, { as: "gr", foreignKey: "gr_id"});
+  GroupOfCats.hasMany(CatGr, { as: "cat_grs", foreignKey: "gr_id"});
 
   return {
-    category,
-    catgr,
-    groupofcats,
-    pomo,
+    CatGr,
+    Category,
+    GroupOfCats,
+    Pomo,
   };
 }
 module.exports = initModels;

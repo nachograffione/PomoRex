@@ -15,32 +15,38 @@ INSERT INTO category
     VALUES (DEFAULT, 'Otros');
 
 -- Groups
-INSERT INTO groupOfCats
+INSERT INTO group_of_cats
     VALUES (DEFAULT, 'Facultad');
-INSERT INTO groupOfCats
+INSERT INTO group_of_cats
     VALUES (DEFAULT, 'Música');
-INSERT INTO groupOfCats
+INSERT INTO group_of_cats
     VALUES (DEFAULT, 'Ingeniería');
 
 -- Assignments
-INSERT INTO catGr
+INSERT INTO cat_gr
     VALUES ((SELECT id FROM category WHERE name = 'Estudio facultad'),
-            (SELECT id FROM groupOfCats WHERE name = 'Facultad'));
-INSERT INTO catGr
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Facultad'));
+INSERT INTO cat_gr
     VALUES ((SELECT id FROM category WHERE name = 'TPs, Otros de facultad'),
-            (SELECT id FROM groupOfCats WHERE name = 'Facultad'));
-INSERT INTO catGr
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Facultad'));
+INSERT INTO cat_gr
     VALUES ((SELECT id FROM category WHERE name = 'Clases música'),
-            (SELECT id FROM groupOfCats WHERE name = 'Música'));
-INSERT INTO catGr
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Música'));
+INSERT INTO cat_gr
     VALUES ((SELECT id FROM category WHERE name = 'Ejercitar, tocar, componer, etc.'),
-            (SELECT id FROM groupOfCats WHERE name = 'Música'));
-INSERT INTO catGr
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Música'));
+INSERT INTO cat_gr
     VALUES ((SELECT id FROM category WHERE name = 'Clases ingeniería'),
-            (SELECT id FROM groupOfCats WHERE name = 'Ingeniería'));
-INSERT INTO catGr
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Ingeniería'));
+INSERT INTO cat_gr
     VALUES ((SELECT id FROM category WHERE name = 'Trabajo programación'),
-            (SELECT id FROM groupOfCats WHERE name = 'Ingeniería'));
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Ingeniería'));
 
 -- Pomos
 INSERT INTO pomo

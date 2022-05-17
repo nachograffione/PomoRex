@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('catgr', {
-    catid: {
+  return sequelize.define('CatGr', {
+    cat_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -9,30 +9,30 @@ module.exports = function(sequelize, DataTypes) {
         key: 'id'
       }
     },
-    grid: {
+    gr_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'groupofcats',
+        model: 'group_of_cats',
         key: 'id'
       }
     }
   }, {
     sequelize,
-    tableName: 'catgr',
+    tableName: 'cat_gr',
     schema: 'public',
     timestamps: false,
     indexes: [
       {
-        name: "index_fk_catgr_category",
+        name: "index_fk_cat_gr_category",
         fields: [
-          { name: "catid" },
+          { name: "cat_id" },
         ]
       },
       {
-        name: "index_fk_catgr_groupofcats",
+        name: "index_fk_cat_gr_group_of_cats",
         fields: [
-          { name: "grid" },
+          { name: "gr_id" },
         ]
       },
     ]
