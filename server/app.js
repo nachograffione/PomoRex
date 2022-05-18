@@ -53,7 +53,7 @@ app.get("/api/categories", async (req, res, next) => {
 app.get("/api/categories/:id", async (req, res, next) => {
     // params: req.params.id
     res.send({
-        category: await pomoRepository.getCategory(parseInt(req.params.id))
+        category: (await pomoRepository.getCategory(parseInt(req.params.id)))[0]
     });
 });
 app.get("/api/pomos", async (req, res, next) => {
@@ -82,7 +82,7 @@ app.get("/api/pomos", async (req, res, next) => {
 app.get("/api/pomos/:id", async (req, res, next) => {
     // params: req.params.id
     res.send({
-        pomo: await pomoRepository.getPomo(parseInt(req.params.id))
+        pomo: (await pomoRepository.getPomo(parseInt(req.params.id)))[0]
     });
 });
 app.get("/api/aggregations/pomos-quantities", async (req, res, next) => {
