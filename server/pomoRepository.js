@@ -46,6 +46,19 @@ class PomoRepository {
             }
         );
     }
+
+    async getCategory(id) {
+        return await this.sequelize.query(
+            "SELECT * FROM category WHERE \
+                id = :id",
+            {
+                replacements: {
+                    id: id
+                },
+                type: QueryTypes.SELECT
+            }
+        );
+    }
 }
 
 exports.PomoRepository = PomoRepository;

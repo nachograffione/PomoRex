@@ -54,9 +54,9 @@ app.get("/api/categories", async (req, res, next) => {
 
 });
 app.get("/api/categories/:id", async (req, res, next) => {
-    // params: id
+    // params: req.params.id
     res.send({
-        // to fill
+        category: await pomoRepository.getCategory(parseInt(req.params.id))
     });
 });
 app.get("/api/pomos", async (req, res, next) => {
@@ -66,7 +66,7 @@ app.get("/api/pomos", async (req, res, next) => {
     });
 });
 app.get("/api/pomos/:id", async (req, res, next) => {
-    // params: id
+    // params: req.params.id
     res.send({
         // to fill
     });
@@ -92,15 +92,15 @@ app.post("/api/pomos", async (req, res, next) => {
 });
 //      patch
 app.patch("/api/categories/:id", async (req, res, next) => {
-    // params: id, req.body.newName
+    // params: req.params.id, req.body.newName
 });
 app.patch("/api/pomos/:id", async (req, res, next) => {
-    // params: id, req.body.newDatetime, req.body.newCatId
+    // params: req.params.id, req.body.newDatetime, req.body.newCatId
 });
 //      delete
 app.delete("/api/categories/:id", async (req, res, next) => {
-    // params: id
+    // params: req.params.id
 });
 app.delete("/api/pomos/:id", async (req, res, next) => {
-    // params: id
+    // params: req.params.id
 });
