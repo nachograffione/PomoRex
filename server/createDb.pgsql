@@ -35,7 +35,7 @@ CREATE INDEX index_fk_cat_gr_group_of_cats
 
 CREATE TABLE pomo (
     id              SERIAL,     -- == INT NOT NULL
-	datetime        TIMESTAMP NOT NULL,
+	datetime        TIMESTAMPTZ NOT NULL,
     cat_id           INT NOT NULL,
 
     CONSTRAINT pk_pomo              PRIMARY KEY (id),
