@@ -57,9 +57,26 @@ app.get("/api/categories/:id", async (req, res, next) => {
     });
 });
 app.get("/api/pomos", async (req, res, next) => {
-    // params: req.query.lastAmount, req.query.dateFrom, req.query.dateTo
+    // params: req.query.categories, req.query.dateFrom, req.query.dateTo, req.query.lastAmount
+
+    // parse from queryString to a list of ints
+    let categories = undefined;
+    if (req.query.categories != undefined) {
+        categories = req.query.categories.split(",").map(str => parseInt(str));
+    }
+
+    // dateFrom and dateTo already work as strings
+    const dateFrom = req.query.dateFrom;
+    const dateTo = req.query.dateTo;
+
+    // parse from queryString to int
+    let lastAmount = undefined;
+    if (req.query.lastAmount != undefined) {
+        lastAmount = parseInt(req.query.lastAmount);
+    }
+
     res.send({
-        // to fill
+        pomos: await pomoRepository.getPomos(categories, dateFrom, dateTo, lastAmount)
     });
 });
 app.get("/api/pomos/:id", async (req, res, next) => {

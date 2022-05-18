@@ -65,6 +65,65 @@ class PomoRepository {
             }
         );
     }
+
+    async getPomos(categories = undefined, dateFrom = undefined, dateTo = undefined, lastAmount = undefined) {
+        // Expected date format: "YYYY-MM-DD"
+        // Date interval: [dateFrom, dateTo)
+        //      Thinking that a date starts at 00:00:00.000
+
+        // since ALL is not a value but a reserved words, it needs to be added as plain text, it can't be added through sequelize replacements
+        let query = "SELECT * FROM pomo WHERE \
+                        datetime >= :datetimeFrom \
+                        AND datetime < :datetimeTo \
+                        AND cat_id IN (:categories) \
+                        ORDER BY datetime DESC \
+                        LIMIT :lastAmount";
+        let replacements = {};
+
+        // set categories
+        if (categories == undefined) {
+            // get all the categories' id
+            categories = await this.getCategories();
+            categories = categories.map(category => category.id);
+        }
+        replacements.categories = categories;
+
+        // set datetimeFrom as -infinity or the given date and 00:00:00.000 as time
+        let datetimeFrom;
+        if (dateFrom == undefined) {
+            datetimeFrom = "-infinity"; // postgre uses this string value as the earliest date
+        }
+        else {
+            datetimeFrom = new Date(dateFrom); // the constructor adds 00:00.000 as time
+        }
+        replacements.datetimeFrom = datetimeFrom;
+
+        // set datetimeTo as the current datetime or the given date and 00:00:00.000 as time
+        let datetimeTo;
+        if (dateTo == undefined) {
+            datetimeTo = new Date(); // it returns current datetime by default
+        }
+        else {
+            datetimeTo = new Date(dateTo); // the constructor adds 00:00.000 as time
+        }
+        replacements.datetimeTo = datetimeTo;
+
+        // set lastAmount as ALL or the given int
+        if (lastAmount == undefined) {
+            query = query.replace(":lastAmount", "ALL");
+        }
+        else {
+            replacements.lastAmount = lastAmount;
+        }
+
+        return await this.sequelize.query(
+            query,
+            {
+                replacements: replacements,
+                type: QueryTypes.SELECT
+            }
+        );
+    }
 }
 
 exports.PomoRepository = PomoRepository;
