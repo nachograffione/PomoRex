@@ -124,6 +124,19 @@ class PomoRepository {
             }
         );
     }
+
+    async getPomo(id) {
+        return await this.sequelize.query(
+            "SELECT * FROM pomo WHERE \
+                id = :id",
+            {
+                replacements: {
+                    id: id
+                },
+                type: QueryTypes.SELECT
+            }
+        );
+    }
 }
 
 exports.PomoRepository = PomoRepository;

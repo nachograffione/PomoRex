@@ -82,7 +82,7 @@ app.get("/api/pomos", async (req, res, next) => {
 app.get("/api/pomos/:id", async (req, res, next) => {
     // params: req.params.id
     res.send({
-        // to fill
+        pomo: await pomoRepository.getPomo(parseInt(req.params.id))
     });
 });
 app.get("/api/aggregations/pomos-quantities", async (req, res, next) => {
