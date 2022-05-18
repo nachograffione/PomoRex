@@ -2,9 +2,12 @@
 //      ejs is required in set EJS section implicitly
 const path = require("path");
 const express = require("express");
-const pomoRepository = require("./pomoRepository");
+const { PomoRepository } = require("./pomoRepository");
 // params
 const port = 3000;
+
+// instantiate PomoRepository
+const pomoRepository = new PomoRepository();
 
 // start server
 const app = express();
@@ -37,9 +40,18 @@ app.get("/control", (req, res, next) => {
 //      get
 app.get("/api/categories", async (req, res, next) => {
     // params: req.query.groups
-    res.send({
-        // to fill
-    });
+    if (req.query.groups == undefined) {
+        res.send({
+            categories: await pomoRepository.getCategories()
+        });
+    }
+    else {
+        const groups = req.query.groups.split(",").map(str => parseInt(str));
+        res.send({
+            categories: await pomoRepository.getCategories(groups)
+        });
+    }
+
 });
 app.get("/api/categories/:id", async (req, res, next) => {
     // params: id

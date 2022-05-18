@@ -19,8 +19,22 @@ class PomoRepository {
         this.models = initModels(this.sequelize);
     }
 
-    async getCategories(groups) {
-        const results = await this.sequelize.query(
+    async getGroups() {
+        return await this.sequelize.query(
+            "SELECT * FROM group_of_cats",
+            {
+                type: QueryTypes.SELECT
+            }
+        );
+    }
+
+    async getCategories(groups = undefined) {
+        // groups is a list of ids
+        if (groups == undefined) {
+            groups = await this.getGroups();
+            groups = groups.map(group => group.id);
+        }
+        return await this.sequelize.query(
             "SELECT * FROM category WHERE \
                 id IN (SELECT cat_id FROM cat_gr WHERE \
                         gr_id IN (:groups))",
@@ -29,8 +43,8 @@ class PomoRepository {
                     groups: groups
                 },
                 type: QueryTypes.SELECT
-            });
-        return results;
+            }
+        );
     }
 }
 
