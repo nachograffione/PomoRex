@@ -40,18 +40,15 @@ app.get("/control", (req, res, next) => {
 //      get
 app.get("/api/categories", async (req, res, next) => {
     // params: req.query.groups
-    if (req.query.groups == undefined) {
-        res.send({
-            categories: await pomoRepository.getCategories()
-        });
-    }
-    else {
-        const groups = req.query.groups.split(",").map(str => parseInt(str));
-        res.send({
-            categories: await pomoRepository.getCategories(groups)
-        });
-    }
 
+    // parse from queryString to a list of ints
+    let groups = undefined;
+    if (req.query.groups != undefined) {
+        groups = req.query.groups.split(",").map(str => parseInt(str));
+    }
+    res.send({
+        categories: await pomoRepository.getCategories(groups)
+    });
 });
 app.get("/api/categories/:id", async (req, res, next) => {
     // params: req.params.id

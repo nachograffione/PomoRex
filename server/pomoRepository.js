@@ -30,18 +30,24 @@ class PomoRepository {
 
     async getCategories(groups = undefined) {
         // groups is a list of ids
+
+        let query = "SELECT * FROM category WHERE \
+                        id IN (SELECT cat_id FROM cat_gr WHERE \
+                                    gr_id IN (:groups))";
+        let replacements = {};
+
+        // include all groups keeps out the ungrouped categories, so to include all of them i have to remove the condition
         if (groups == undefined) {
-            groups = await this.getGroups();
-            groups = groups.map(group => group.id);
+            query = query.slice(0, query.indexOf("WHERE")); // it keeps from the begining to the first WHERE
         }
+        else {
+            replacements.groups = groups;
+        }
+
         return await this.sequelize.query(
-            "SELECT * FROM category WHERE \
-                id IN (SELECT cat_id FROM cat_gr WHERE \
-                        gr_id IN (:groups))",
+            query,
             {
-                replacements: {
-                    groups: groups
-                },
+                replacements: replacements,
                 type: QueryTypes.SELECT
             }
         );
