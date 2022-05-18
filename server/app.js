@@ -59,21 +59,7 @@ app.get("/api/categories/:id", async (req, res, next) => {
 app.get("/api/pomos", async (req, res, next) => {
     // params: req.query.categories, req.query.dateFrom, req.query.dateTo, req.query.lastAmount
 
-    // parse from queryString to a list of ints
-    let categories = undefined;
-    if (req.query.categories != undefined) {
-        categories = req.query.categories.split(",").map(str => parseInt(str));
-    }
-
-    // dateFrom and dateTo already work as strings
-    const dateFrom = req.query.dateFrom;
-    const dateTo = req.query.dateTo;
-
-    // parse from queryString to int
-    let lastAmount = undefined;
-    if (req.query.lastAmount != undefined) {
-        lastAmount = parseInt(req.query.lastAmount);
-    }
+    [categories, dateFrom, dateTo, lastAmount] = parseFromQueryString(req.query.categories, req.query.dateFrom, req.query.dateTo, req.query.lastAmount);
 
     res.send({
         pomos: await pomoRepository.getPomos(categories, dateFrom, dateTo, lastAmount)
@@ -118,3 +104,23 @@ app.delete("/api/categories/:id", async (req, res, next) => {
 app.delete("/api/pomos/:id", async (req, res, next) => {
     // params: req.params.id
 });
+
+function parseFromQueryString(queryCategories, queryDateFrom, queryDateTo, queryLastAmount) {
+    // this is only to avoid repeat code
+
+    // parse to a list of ints
+    let categories = undefined;
+    if (queryCategories != undefined) {
+        categories = queryCategories.split(",").map(str => parseInt(str));
+    }
+
+    // dateFrom and dateTo already work as strings
+
+    // parse to int
+    let lastAmount = undefined;
+    if (queryLastAmount != undefined) {
+        lastAmount = parseInt(queryLastAmount);
+    }
+
+    return [categories, queryDateFrom, queryDateTo, lastAmount];
+}
