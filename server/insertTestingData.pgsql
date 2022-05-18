@@ -50,18 +50,18 @@ INSERT INTO cat_gr
 
 -- Pomos
 INSERT INTO pomo
-    VALUES (DEFAULT, '2022/03/01',
+    VALUES (DEFAULT, '2022-03-01 10:00:00.000 -03:00',
             (SELECT id FROM category
                 WHERE name = 'Clases ingeniería'));
 INSERT INTO pomo
-    VALUES (DEFAULT, '2022/03/01',
+    VALUES (DEFAULT, '2022-03-01 10:30:00.000 -03:00',
             (SELECT id FROM category
                 WHERE name = 'Otros'));
 INSERT INTO pomo
-    VALUES (DEFAULT, '2022/03/02',
+    VALUES (DEFAULT, '2022-03-02 16:00:00.000 -03:00',
             (SELECT id FROM category
                 WHERE name = 'Estudio facultad'));
 INSERT INTO pomo
-    VALUES (DEFAULT, '2022/03/02',
+    VALUES (DEFAULT, '2022-03-02 16:45:00.000 -03:00',
             (SELECT id FROM category
                 WHERE name = 'Otros'));
