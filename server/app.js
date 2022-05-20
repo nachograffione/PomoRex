@@ -41,11 +41,8 @@ app.get("/control", (req, res, next) => {
 app.get("/api/categories", async (req, res, next) => {
     // params: req.query.groups
 
-    // parse from queryString to a list of ints
-    let groups = undefined;
-    if (req.query.groups != undefined) {
-        groups = req.query.groups.split(",").map(str => parseInt(str));
-    }
+    const groups = parseIdArrayFromQueryString(req.query.groups);
+
     res.send({
         categories: await pomoRepository.getCategories(groups)
     });
@@ -59,10 +56,18 @@ app.get("/api/categories/:id", async (req, res, next) => {
 app.get("/api/pomos", async (req, res, next) => {
     // params: req.query.categories, req.query.dateFrom, req.query.dateTo, req.query.lastAmount
 
-    [categories, dateFrom, dateTo, lastAmount] = parseFromQueryString(req.query.categories, req.query.dateFrom, req.query.dateTo, req.query.lastAmount);
+    const categories = parseIdArrayFromQueryString(req.query.categories);
+
+    // dateFrom and dateTo already work as strings
+
+    // parse to int
+    let lastAmount = undefined;
+    if (req.query.lastAmount != undefined) {
+        lastAmount = parseInt(req.query.lastAmount);
+    }
 
     res.send({
-        pomos: await pomoRepository.getPomos(categories, dateFrom, dateTo, lastAmount)
+        pomos: await pomoRepository.getPomos(categories, req.query.dateFrom, req.query.dateTo, lastAmount)
     });
 });
 app.get("/api/pomos/:id", async (req, res, next) => {
@@ -105,22 +110,13 @@ app.delete("/api/pomos/:id", async (req, res, next) => {
     // params: req.params.id
 });
 
-function parseFromQueryString(queryCategories, queryDateFrom, queryDateTo, queryLastAmount) {
-    // this is only to avoid repeat code
+function parseIdArrayFromQueryString(queryArray) {
+    // useful for either groups and categories
 
     // parse to a list of ints
-    let categories = undefined;
-    if (queryCategories != undefined) {
-        categories = queryCategories.split(",").map(str => parseInt(str));
+    let idArray = undefined;
+    if (queryArray != undefined) {
+        idArray = queryArray.split(",").map(str => parseInt(str));
     }
-
-    // dateFrom and dateTo already work as strings
-
-    // parse to int
-    let lastAmount = undefined;
-    if (queryLastAmount != undefined) {
-        lastAmount = parseInt(queryLastAmount);
-    }
-
-    return [categories, queryDateFrom, queryDateTo, lastAmount];
+    return idArray;
 }
