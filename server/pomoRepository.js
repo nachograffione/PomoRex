@@ -72,7 +72,7 @@ class PomoRepository {
         //      Thinking that a date starts at 00:00:00.000
 
         // since ALL is not a value but a reserved words, it needs to be added as plain text, it can't be added through sequelize replacements
-        let query = "SELECT * FROM pomo WHERE \
+        let query = "SELECT id, datetime, cat_id AS \"catId\" FROM pomo WHERE \
                         datetime >= :datetimeFrom \
                         AND datetime < :datetimeTo \
                         AND cat_id IN (:categories) \
@@ -101,7 +101,7 @@ class PomoRepository {
 
     async getPomo(id) {
         return await this.sequelize.query(
-            "SELECT * FROM pomo WHERE \
+            "SELECT id, datetime, cat_id AS \"catId\" FROM pomo WHERE \
                 id = :id",
             {
                 replacements: {
@@ -134,12 +134,12 @@ class PomoRepository {
         // get a list of quantities for each combination of date and category
         const queryResult = await this.sequelize.query(
             // The count parsing is because postgres returns a bigint for COUNT columns, which is not suported
-            "SELECT date(datetime) AS date_only, cat_id, COUNT(id)::INT AS quantity FROM pomo WHERE \
+            "SELECT date(datetime) AS \"dateOnly\", cat_id AS \"catId\", COUNT(id)::INT AS quantity FROM pomo WHERE \
                 datetime >= :datetimeFrom \
                 AND datetime < :datetimeTo \
                 AND cat_id IN (:categories) \
-                GROUP BY (date_only, cat_id) \
-                ORDER BY date_only DESC",
+                GROUP BY (\"dateOnly\", cat_id) \
+                ORDER BY \"dateOnly\" DESC",
             {
                 replacements: replacements,
                 type: QueryTypes.SELECT
