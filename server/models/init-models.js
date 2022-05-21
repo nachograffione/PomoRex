@@ -10,12 +10,12 @@ function initModels(sequelize) {
   var GroupOfCats = _GroupOfCats(sequelize, DataTypes);
   var Pomo = _Pomo(sequelize, DataTypes);
 
-  CatGr.belongsTo(Category, { as: "cat", foreignKey: "cat_id"});
-  Category.hasMany(CatGr, { as: "cat_grs", foreignKey: "cat_id"});
-  Pomo.belongsTo(Category, { as: "cat", foreignKey: "cat_id"});
-  Category.hasMany(Pomo, { as: "pomos", foreignKey: "cat_id"});
-  CatGr.belongsTo(GroupOfCats, { as: "gr", foreignKey: "gr_id"});
-  GroupOfCats.hasMany(CatGr, { as: "cat_grs", foreignKey: "gr_id"});
+  CatGr.belongsTo(Category, { as: "cat", foreignKey: "catId"});
+  Category.hasMany(CatGr, { as: "catGrs", foreignKey: "catId"});
+  Pomo.belongsTo(Category, { as: "cat", foreignKey: "catId"});
+  Category.hasMany(Pomo, { as: "pomos", foreignKey: "catId"});
+  CatGr.belongsTo(GroupOfCats, { as: "gr", foreignKey: "grId"});
+  GroupOfCats.hasMany(CatGr, { as: "catGrs", foreignKey: "grId"});
 
   return {
     CatGr,

@@ -11,13 +11,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATE,
       allowNull: false
     },
-    cat_id: {
+    catId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'category',
         key: 'id'
-      }
+      },
+      field: 'cat_id'
     }
   }, {
     sequelize,
