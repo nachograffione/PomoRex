@@ -78,8 +78,8 @@ class PomoRepository {
                         AND cat_id IN (:categories) \
                         ORDER BY datetime DESC \
                         LIMIT :lastAmount";
-        let replacements = {};
 
+        let replacements = {};
         [replacements.categories, replacements.datetimeFrom, replacements.datetimeTo] = await this.setCommonParams(categories, dateFrom, dateTo);
 
         // set lastAmount as ALL or the given int
@@ -110,6 +110,63 @@ class PomoRepository {
                 type: QueryTypes.SELECT
             }
         );
+    }
+
+    async getPomosQuantities(categories = undefined, dateFrom = undefined, dateTo = undefined) {
+        // Return format:
+        // [
+        //      {
+        //          date: <date>,
+        //          categories: [
+        //              {
+        //                  cat_id: <cat_id>,
+        //                  quantity: <quantity>
+        //              }
+        //              ...
+        //          ]
+        //      }
+        //      ...
+        // ]
+
+        let replacements = {};
+        [replacements.categories, replacements.datetimeFrom, replacements.datetimeTo] = await this.setCommonParams(categories, dateFrom, dateTo);
+
+        // get a list of quantities for each combination of date and category
+        const queryResult = await this.sequelize.query(
+            // The count parsing is because postgres returns a bigint for COUNT columns, which is not suported
+            "SELECT date(datetime) AS date_only, cat_id, COUNT(id)::INT AS quantity FROM pomo WHERE \
+                datetime >= :datetimeFrom \
+                AND datetime < :datetimeTo \
+                AND cat_id IN (:categories) \
+                GROUP BY (date_only, cat_id) \
+                ORDER BY date_only DESC",
+            {
+                replacements: replacements,
+                type: QueryTypes.SELECT
+            }
+        );
+
+        // keep in mind that queryResult is ordered by date
+        let dates = [];
+        for (const dateCatQty of queryResult) {
+            let lastDay = dates[dates.length - 1]; // be careful with references values things
+            // if the last date doesn't exist or is different from the current item
+            if (lastDay == undefined || lastDay.date_only != dateCatQty.date_only) {
+                // make a new empty date and refresh lastDay
+                dates.push({
+                    date: dateCatQty.date_only,
+                    categories: []
+                });
+                lastDay = dates[dates.length - 1];
+            }
+            // either with an existing date or the recently created one
+            lastDay.categories.push({
+                cat_id: dateCatQty.cat_id,
+                quantity: dateCatQty.quantity
+            });
+        }
+
+        return { dates: dates };
     }
 
     async setCommonParams(categories = undefined, dateFrom = undefined, dateTo = undefined) {
