@@ -1,4 +1,18 @@
-﻿-- Categories
+﻿-- Categories and groups
+-- Criteria:
+--      grouped cats, ungrouped cats
+
+-- Data:
+-- Categories:                             Groups:
+-- Estudio facultad                        Facultad
+-- TPs, Otros de facultad                  Facultad
+-- Clases música                           Música
+-- Ejercitar, tocar, componer, etc.        Música
+-- Clases ingeniería                       Ingeniería
+-- Trabajo programación                    Ingeniería
+-- Otros                                   -
+
+-- Categories
 INSERT INTO category
     VALUES (DEFAULT, 'Estudio facultad');
 INSERT INTO category
@@ -49,63 +63,69 @@ INSERT INTO cat_gr
          WHERE name = 'Ingeniería'));
 
 -- Pomos
+-- Criteria:
+--      days with repeated pomos, unrepeated pomos, combinations of them, different hours, different cats and groups
+
+-- Data:
+-- 2022-03-01
+--     2 Estudio facultad
+--     1 Clases música
+-- 2022-03-02
+--     1 Ejercitar, tocar, componer, etc.
+--     1 Otros
+-- 2022-03-03
+--     0
+-- 2022-03-04
+--     3 Trabajo programación
+--     4 Estudio facultad
+
 INSERT INTO pomo
     VALUES (DEFAULT, '2022-03-01 10:00:00.000 -03:00',
             (SELECT id FROM category
-                WHERE name = 'Clases ingeniería'));
+                WHERE name = 'Estudio facultad'));
 INSERT INTO pomo
     VALUES (DEFAULT, '2022-03-01 10:30:00.000 -03:00',
             (SELECT id FROM category
-                WHERE name = 'Clases ingeniería'));
+                WHERE name = 'Estudio facultad'));
 INSERT INTO pomo
     VALUES (DEFAULT, '2022-03-01 11:15:00.000 -03:00',
             (SELECT id FROM category
-                WHERE name = 'Clases ingeniería'));
-INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-01 10:30:00.000 -03:00',
-            (SELECT id FROM category
-                WHERE name = 'Otros'));
+                WHERE name = 'Clases música'));
+
 INSERT INTO pomo
     VALUES (DEFAULT, '2022-03-02 16:00:00.000 -03:00',
             (SELECT id FROM category
+                WHERE name = 'Ejercitar, tocar, componer, etc.'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-02 12:00:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Otros'));
+
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 17:00:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Trabajo programación'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 16:45:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Trabajo programación'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 16:50:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Trabajo programación'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 16:50:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Trabajo programación'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 16:51:00.000 -03:00',
+            (SELECT id FROM category
                 WHERE name = 'Estudio facultad'));
 INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-02 17:00:00.000 -03:00',
+    VALUES (DEFAULT, '2022-03-04 17:15:00.000 -03:00',
             (SELECT id FROM category
                 WHERE name = 'Estudio facultad'));
 INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-02 16:45:00.000 -03:00',
+    VALUES (DEFAULT, '2022-03-04 23:59:00.000 -03:00',
             (SELECT id FROM category
-                WHERE name = 'Otros'));
-INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-02 16:50:00.000 -03:00',
-            (SELECT id FROM category
-                WHERE name = 'Otros'));
-INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-02 16:50:00.000 -03:00',
-            (SELECT id FROM category
-                WHERE name = 'Otros'));
-INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-02 16:51:00.000 -03:00',
-            (SELECT id FROM category
-                WHERE name = 'Otros'));
-INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-02 17:15:00.000 -03:00',
-            (SELECT id FROM category
-                WHERE name = 'Otros'));
-INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-02 23:59:00.000 -03:00',
-            (SELECT id FROM category
-                WHERE name = 'Otros'));
-INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-03 23:59:00.000 -03:00',
-            (SELECT id FROM category
-                WHERE name = 'Trabajo programación'));
-INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-04 08:40:00.000 -03:00',
-            (SELECT id FROM category
-                WHERE name = 'Trabajo programación'));
-INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-04 08:45:00.000 -03:00',
-            (SELECT id FROM category
-                WHERE name = 'Trabajo programación'));
+                WHERE name = 'Estudio facultad'));
