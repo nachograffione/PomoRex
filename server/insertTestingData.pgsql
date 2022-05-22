@@ -76,8 +76,8 @@ INSERT INTO cat_gr
 -- 2022-03-03
 --     0
 -- 2022-03-04
---     3 Trabajo programación
---     4 Estudio facultad
+--     4 Trabajo programación
+--     3 Estudio facultad
 
 INSERT INTO pomo
     VALUES (DEFAULT, '2022-03-01 10:00:00.000 -03:00',
