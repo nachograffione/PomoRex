@@ -12,7 +12,14 @@ class PomoRepository {
                 timestamps: true,
                 define: {
                     freezeTableName: true
-                }
+                },
+                // for timezone working
+                dialect: 'postgres',
+                dialectOptions: { // for reading
+                    useUTC: false,
+                    timezone: '-03:00',
+                },
+                timezone: '-03:00', // for writing
             }
         );
         // sequelize-auto init
@@ -71,7 +78,7 @@ class PomoRepository {
         // Date interval: [dateFrom, dateTo)
         //      Thinking that a date starts at 00:00:00.000
 
-        // since ALL is not a value but a reserved words, it needs to be added as plain text, it can't be added through sequelize replacements
+        // since ALL is not a value but a reserved word, it needs to be added as plain text, it can't be added through sequelize replacements
         let query = "SELECT id, datetime, cat_id AS \"catId\" FROM pomo WHERE \
                         datetime >= :datetimeFrom \
                         AND datetime < :datetimeTo \
