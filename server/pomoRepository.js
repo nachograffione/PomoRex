@@ -126,7 +126,7 @@ class PomoRepository {
         //          date: <date>,
         //          categories: [
         //              {
-        //                  cat_id: <cat_id>,
+        //                  catId: <catId>,
         //                  quantity: <quantity>
         //              }
         //              ...
@@ -141,12 +141,12 @@ class PomoRepository {
         // get a list of quantities for each combination of date and category
         const queryResult = await this.sequelize.query(
             // The count parsing is because postgres returns a bigint for COUNT columns, which is not suported
-            "SELECT date(datetime) AS \"dateOnly\", cat_id AS \"catId\", COUNT(id)::INT AS quantity FROM pomo WHERE \
+            "SELECT date(datetime) AS \"date\", cat_id AS \"catId\", COUNT(id)::INT AS quantity FROM pomo WHERE \
                 datetime >= :datetimeFrom \
                 AND datetime < :datetimeTo \
                 AND cat_id IN (:categories) \
-                GROUP BY (\"dateOnly\", cat_id) \
-                ORDER BY \"dateOnly\" DESC",
+                GROUP BY (\"date\", cat_id) \
+                ORDER BY \"date\" DESC",
             {
                 replacements: replacements,
                 type: QueryTypes.SELECT
@@ -158,17 +158,18 @@ class PomoRepository {
         for (const dateCatQty of queryResult) {
             let lastDay = dates[dates.length - 1]; // be careful with references values things
             // if the last date doesn't exist or is different from the current item
-            if (lastDay == undefined || lastDay.date_only != dateCatQty.date_only) {
-                // make a new empty date and refresh lastDay
+            if (lastDay == undefined || lastDay.date != dateCatQty.date) {
+                // make a new empty date
                 dates.push({
-                    date: dateCatQty.date_only,
+                    date: dateCatQty.date,
                     categories: []
                 });
+                // refresh lastDay
                 lastDay = dates[dates.length - 1];
             }
             // either with an existing date or the recently created one
             lastDay.categories.push({
-                cat_id: dateCatQty.cat_id,
+                catId: dateCatQty.catId,
                 quantity: dateCatQty.quantity
             });
         }
