@@ -64,23 +64,24 @@ INSERT INTO cat_gr
 
 -- Pomos
 -- Criteria:
---      days with repeated pomos, unrepeated pomos, combinations of them, different hours, different cats and groups
+--      days with repeated pomos, unrepeated pomos, combinations of them, different hours (including time endpoints), different cats and groups
 
 -- Data:
--- 2022-03-01
---     2 Estudio facultad
---     1 Clases música
--- 2022-03-02
---     1 Ejercitar, tocar, componer, etc.
---     1 Otros
--- 2022-03-03
---     0
 -- 2022-03-04
 --     4 Trabajo programación
 --     3 Estudio facultad
+-- 2022-03-03
+--     0
+-- 2022-03-02
+--     1 Ejercitar, tocar, componer, etc.
+--     1 Otros
+-- 2022-03-01
+--     2 Estudio facultad
+--     1 Clases música
+
 
 INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-01 10:00:00.000 -03:00',
+    VALUES (DEFAULT, '2022-03-01 00:00:00.000 -03:00', -- first time endpoint
             (SELECT id FROM category
                 WHERE name = 'Estudio facultad'));
 INSERT INTO pomo
@@ -126,6 +127,6 @@ INSERT INTO pomo
             (SELECT id FROM category
                 WHERE name = 'Estudio facultad'));
 INSERT INTO pomo
-    VALUES (DEFAULT, '2022-03-04 23:59:00.000 -03:00',
+    VALUES (DEFAULT, '2022-03-04 23:59:59.999 -03:00',  -- last time endpoint
             (SELECT id FROM category
                 WHERE name = 'Estudio facultad'));
