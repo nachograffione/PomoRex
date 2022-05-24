@@ -120,6 +120,8 @@ class PomoRepository {
     }
 
     async getPomosQuantities(categories = undefined, dateFrom = undefined, dateTo = undefined) {
+        // It returns a list of objects representing each day and their quantities by category
+
         // Return format:
         // [
         //      {
@@ -174,7 +176,7 @@ class PomoRepository {
             });
         }
 
-        return { dates: dates };
+        return dates;
     }
 
     async setCommonParams(categories = undefined, dateFrom = undefined, dateTo = undefined) {
