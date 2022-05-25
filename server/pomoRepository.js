@@ -127,7 +127,7 @@ class PomoRepository {
         // [
         //      {
         //          date: <date>,
-        //          categories: [
+        //          catsAndQties: [
         //              {
         //                  catId: <catId>,
         //                  quantity: <quantity>
@@ -144,12 +144,13 @@ class PomoRepository {
         // get a list of quantities for each combination of date and category
         const queryResult = await this.sequelize.query(
             // The count parsing is because postgres returns a bigint for COUNT columns, which is not suported
-            "SELECT date(datetime) AS \"date\", cat_id AS \"catId\", COUNT(id)::INT AS quantity FROM pomo WHERE \
-                date(datetime) >= :dateFrom \
-                AND date(datetime) < :dateTo \
-                AND cat_id IN (:categories) \
-                GROUP BY (date(datetime), cat_id) \
-                ORDER BY date(datetime) DESC",
+            "SELECT date(generate_series) AS \"date\", cat_id AS \"catId\", COUNT(id)::INT AS quantity \
+                FROM pomo RIGHT JOIN generate_series(:dateFrom::timestamp with time zone, :dateTo, '1 day') \
+                    ON date(datetime) = date(generate_series) \
+                WHERE cat_id IN (:categories) \
+                        OR cat_id IS NULL \
+                GROUP BY (date(generate_series), cat_id) \
+                ORDER BY date(generate_series) DESC",
             {
                 replacements: replacements,
                 type: QueryTypes.SELECT
@@ -165,16 +166,18 @@ class PomoRepository {
                 // make a new empty date
                 dates.push({
                     date: dateCatQty.date,
-                    categories: []
+                    catsAndQties: []
                 });
                 // refresh lastDay
                 lastDay = dates[dates.length - 1];
             }
-            // either with an existing date or the recently created one
-            lastDay.categories.push({
-                catId: dateCatQty.catId,
-                quantity: dateCatQty.quantity
-            });
+            // if there's no pomos for this day, keep categories array empty
+            if (dateCatQty.catId != null) {
+                lastDay.catsAndQties.push({
+                    catId: dateCatQty.catId,
+                    quantity: dateCatQty.quantity
+                });
+            }
         }
 
         return dates;
@@ -188,9 +191,15 @@ class PomoRepository {
             categories = categories.map(category => category.id);
         }
 
-        // set dateFrom as the earliest date by default
+        // set dateFrom as the earliest date inserted by default
         if (dateFrom == undefined) {
-            dateFrom = "-infinity"; // postgres uses this string value as the earliest date
+            const queryResult = await this.sequelize.query(
+                "SELECT MIN(date(datetime)) AS \"date\" FROM pomo",
+                {
+                    type: QueryTypes.SELECT
+                }
+            );
+            dateFrom = queryResult[0].date;
         }
 
         // set dateTo as the next of the current date by default
