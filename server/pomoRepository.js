@@ -256,6 +256,11 @@ class PomoRepository {
         // build and persist the new Category
         return await this.models.Category.create({ name: name });
     }
+
+    async insertPomo(datetime, catId) {
+        // build and persist the new Pomo
+        return await this.models.Pomo.create({ datetime: datetime, catId: catId });;
+    }
 }
 
 exports.PomoRepository = PomoRepository;

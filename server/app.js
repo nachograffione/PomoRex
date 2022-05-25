@@ -105,6 +105,7 @@ app.post("/api/categories", async (req, res, next) => {
 });
 app.post("/api/pomos", async (req, res, next) => {
     // params: req.body.datetime, req.body.catId
+    pomoRepository.insertPomo(req.body.datetime, req.body.catId);
 });
 //      patch
 app.patch("/api/categories/:id", async (req, res, next) => {
