@@ -261,6 +261,27 @@ class PomoRepository {
         // build and persist the new Pomo
         return await this.models.Pomo.create({ datetime: datetime, catId: catId });;
     }
+
+    async updateCategory(id, newName) {
+        let category = undefined;
+        if (newName != undefined) {
+            category = await this.models.Category.findByPk(id);
+            category.name = newName;
+            await category.save();
+        }
+        return category;
+    }
+
+    async updatePomo(id, newDatetime, newCatId) {
+        let pomo = undefined;
+        if (newDatetime != undefined || newCatId != undefined) {
+            pomo = await this.models.Pomo.findByPk(id);
+            if (newDatetime != undefined) pomo.datetime = newDatetime;
+            if (newCatId != undefined) pomo.catId = newCatId;
+            await pomo.save();
+        }
+        return pomo;
+    }
 }
 
 exports.PomoRepository = PomoRepository;

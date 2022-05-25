@@ -114,9 +114,15 @@ app.post("/api/pomos", async (req, res, next) => {
 //      patch
 app.patch("/api/categories/:id", async (req, res, next) => {
     // params: req.params.id, req.body.newName
+    res.send({
+        updatedCategory: await pomoRepository.updateCategory(parseInt(req.params.id), req.body.newName)
+    });
 });
 app.patch("/api/pomos/:id", async (req, res, next) => {
     // params: req.params.id, req.body.newDatetime, req.body.newCatId
+    res.send({
+        updatedPomo: await pomoRepository.updatePomo(parseInt(req.params.id), req.body.newDatetime, req.body.newCatId)
+    });
 });
 //      delete
 app.delete("/api/categories/:id", async (req, res, next) => {
