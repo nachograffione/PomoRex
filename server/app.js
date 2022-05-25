@@ -101,11 +101,15 @@ app.get("/api/aggregations/pomos-averages", async (req, res, next) => {
 //      post
 app.post("/api/categories", async (req, res, next) => {
     // params: req.body.name
-    pomoRepository.insertCategory(req.body.name);
+    res.send({
+        insertedCategory: await pomoRepository.insertCategory(req.body.name)
+    });
 });
 app.post("/api/pomos", async (req, res, next) => {
     // params: req.body.datetime, req.body.catId
-    pomoRepository.insertPomo(req.body.datetime, req.body.catId);
+    res.send({
+        insertedPomo: await pomoRepository.insertPomo(req.body.datetime, req.body.catId)
+    });
 });
 //      patch
 app.patch("/api/categories/:id", async (req, res, next) => {
