@@ -145,10 +145,10 @@ class PomoRepository {
         const queryResult = await this.sequelize.query(
             // The count parsing is because postgres returns a bigint for COUNT columns, which is not suported
             "SELECT date(generate_series) AS \"date\", cat_id AS \"catId\", COUNT(id)::INT AS quantity \
-                FROM pomo RIGHT JOIN generate_series(:dateFrom::timestamp with time zone, :dateTo, '1 day') \
+                FROM pomo RIGHT JOIN generate_series(:dateFrom::TIMESTAMP WITH TIME ZONE, :dateTo, '1 day') \
                     ON date(datetime) = date(generate_series) \
-                WHERE cat_id IN (:categories) \
-                        OR cat_id IS NULL \
+                WHERE (cat_id IN (:categories) \
+                        OR cat_id IS NULL) \
                 GROUP BY (date(generate_series), cat_id) \
                 ORDER BY date(generate_series) DESC",
             {
