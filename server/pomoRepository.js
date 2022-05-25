@@ -75,19 +75,18 @@ class PomoRepository {
 
     async getPomos(categories = undefined, dateFrom = undefined, dateTo = undefined, lastAmount = undefined) {
         // Expected date format: "YYYY-MM-DD"
-        // Date interval: [dateFrom, dateTo)
-        //      Thinking that a date starts at 00:00:00.000
+        // It returns those pomos that match with the categories and are into the half-bounded date interval [dateFrom, dateTo)
 
         // since ALL is not a value but a reserved word, it needs to be added as plain text, it can't be added through sequelize replacements
         let query = "SELECT id, datetime, cat_id AS \"catId\" FROM pomo WHERE \
-                        datetime >= :datetimeFrom \
-                        AND datetime < :datetimeTo \
+                        date(datetime) >= :dateFrom \
+                        AND date(datetime) < :dateTo \
                         AND cat_id IN (:categories) \
                         ORDER BY datetime DESC \
                         LIMIT :lastAmount";
 
         let replacements = {};
-        [replacements.categories, replacements.datetimeFrom, replacements.datetimeTo] = await this.setCommonParams(categories, dateFrom, dateTo);
+        [replacements.categories, replacements.dateFrom, replacements.dateTo] = await this.setCommonParams(categories, dateFrom, dateTo);
 
         // set lastAmount as ALL or the given int
         if (lastAmount == undefined) {
@@ -120,7 +119,9 @@ class PomoRepository {
     }
 
     async getPomosQuantities(categories = undefined, dateFrom = undefined, dateTo = undefined) {
-        // It returns a list of objects representing each day and their quantities by category
+        // Expected date format: "YYYY-MM-DD"
+        // It returns a list of objects representing each day and their quantities by category,
+        // including those pomos that match with the categories and are into the half-bounded date interval [dateFrom, dateTo)
 
         // Return format:
         // [
@@ -138,17 +139,17 @@ class PomoRepository {
         // ]
 
         let replacements = {};
-        [replacements.categories, replacements.datetimeFrom, replacements.datetimeTo] = await this.setCommonParams(categories, dateFrom, dateTo);
+        [replacements.categories, replacements.dateFrom, replacements.dateTo] = await this.setCommonParams(categories, dateFrom, dateTo);
 
         // get a list of quantities for each combination of date and category
         const queryResult = await this.sequelize.query(
             // The count parsing is because postgres returns a bigint for COUNT columns, which is not suported
             "SELECT date(datetime) AS \"date\", cat_id AS \"catId\", COUNT(id)::INT AS quantity FROM pomo WHERE \
-                datetime >= :datetimeFrom \
-                AND datetime < :datetimeTo \
+                date(datetime) >= :dateFrom \
+                AND date(datetime) < :dateTo \
                 AND cat_id IN (:categories) \
-                GROUP BY (\"date\", cat_id) \
-                ORDER BY \"date\" DESC",
+                GROUP BY (date(datetime), cat_id) \
+                ORDER BY date(datetime) DESC",
             {
                 replacements: replacements,
                 type: QueryTypes.SELECT
@@ -187,25 +188,20 @@ class PomoRepository {
             categories = categories.map(category => category.id);
         }
 
-        // set datetimeFrom as -infinity or the given date and 00:00:00.000 as time
-        let datetimeFrom;
+        // set dateFrom as the earliest date by default
         if (dateFrom == undefined) {
-            datetimeFrom = "-infinity"; // postgre uses this string value as the earliest date
-        }
-        else {
-            datetimeFrom = new Date(dateFrom); // the constructor adds 00:00.000 as time
+            dateFrom = "-infinity"; // postgres uses this string value as the earliest date
         }
 
-        // set datetimeTo as the current datetime or the given date and 00:00:00.000 as time
-        let datetimeTo;
+        // set dateTo as the next of the current date by default
         if (dateTo == undefined) {
-            datetimeTo = new Date(); // it returns current datetime by default
-        }
-        else {
-            datetimeTo = new Date(dateTo); // the constructor adds 00:00.000 as time
+            dateTo = new Date(); // the constructor returns current datetime by default
+            dateTo.setDate(dateTo.getDate() + 1);
+            dateTo = dateTo.toISOString();
+            dateTo = dateTo.slice(0, dateTo.indexOf("T")); // remove time and timezone
         }
 
-        return [categories, datetimeFrom, datetimeTo];
+        return [categories, dateFrom, dateTo];
     }
 }
 
