@@ -1,4 +1,5 @@
 const { Sequelize, DataTypes, QueryTypes } = require("sequelize");
+const Category = require("./models/Category");
 // command line used to generate models imported here:
 // node_modules/.bin/sequelize-auto -o "./models" -d pomo_rex -h localhost -u postgres -p 5433 -x postgres -e postgres --caseFile p --caseModel p --caseProp c
 const initModels = require("./models/init-models");
@@ -181,6 +182,44 @@ class PomoRepository {
         }
 
         return dates;
+    }
+
+    async getPomosAverages(categories = undefined, dateFrom = undefined, dateTo = undefined) {
+        // Expected date format: "YYYY-MM-DD"
+        // It returns a list of objects with the average for each category (dividing by week days)
+        // including those pomos that match with the categories and are into the half-bounded date interval [dateFrom, dateTo)
+
+        // Return format:
+        // [
+        //      {
+        //          catId: <catId>,
+        //          average: <average>
+        //      }
+        //      ...
+        // ]
+
+        let replacements = {};
+        [replacements.categories, replacements.dateFrom, replacements.dateTo] = await this.setCommonParams(categories, dateFrom, dateTo);
+
+        return await this.sequelize.query(
+            // The count parsing is because postgres returns a bigint for COUNT columns, which is not suported
+            // I can't use AVG() because i need to count pomos for every day but divide only by weekdays,
+            // so i have to count them separately and divide manually
+            "SELECT category.id AS \"catId\", COUNT(pomos.id)::INT/(SELECT COUNT(generate_series)::INT \
+                                                            FROM generate_series(:dateFrom::TIMESTAMP WITH TIME ZONE, :dateTo, '1 day') \
+                                                            WHERE EXTRACT(isodow FROM generate_series) NOT IN(6, 7))::REAL AS average \
+                FROM category LEFT JOIN(SELECT * FROM pomo \
+                                            WHERE date(datetime) >= :dateFrom \
+                                            AND date(datetime) < :dateTo) AS pomos \
+                    ON cat_id = category.id \
+                WHERE category.id IN(:categories) \
+                GROUP BY category.id \
+                ORDER BY category.id",
+            {
+                replacements: replacements,
+                type: QueryTypes.SELECT
+            }
+        );
     }
 
     async setCommonParams(categories = undefined, dateFrom = undefined, dateTo = undefined) {

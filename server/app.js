@@ -88,9 +88,14 @@ app.get("/api/aggregations/pomos-quantities", async (req, res, next) => {
     });
 });
 app.get("/api/aggregations/pomos-averages", async (req, res, next) => {
-    // params: req.query.lastAmount, req.query.dateFrom, req.query.dateTo
+    // params: req.query.categories, req.query.dateFrom, req.query.dateTo
+
+    const categories = parseIdArrayFromQueryString(req.query.categories);
+
+    // dateFrom and dateTo already work as strings
+
     res.send({
-        // to fill
+        pomosAverages: await pomoRepository.getPomosAverages(categories, req.query.dateFrom, req.query.dateTo)
     });
 });
 //      post
