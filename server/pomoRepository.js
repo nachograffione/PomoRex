@@ -282,6 +282,18 @@ class PomoRepository {
         }
         return pomo;
     }
+
+    async deleteCategory(id) {
+        const category = await this.models.Category.findByPk(id);
+        await category.destroy();
+        return category;
+    }
+
+    async deletePomo(id) {
+        const pomo = await this.models.Pomo.findByPk(id);
+        await pomo.destroy();
+        return pomo;
+    }
 }
 
 exports.PomoRepository = PomoRepository;

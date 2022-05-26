@@ -127,9 +127,15 @@ app.patch("/api/pomos/:id", async (req, res, next) => {
 //      delete
 app.delete("/api/categories/:id", async (req, res, next) => {
     // params: req.params.id
+    res.send({
+        deletedCategory: await pomoRepository.deleteCategory(parseInt(req.params.id))
+    });
 });
 app.delete("/api/pomos/:id", async (req, res, next) => {
     // params: req.params.id
+    res.send({
+        deletedPomo: await pomoRepository.deletePomo(parseInt(req.params.id))
+    });
 });
 
 function parseIdArrayFromQueryString(queryArray) {
