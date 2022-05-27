@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes, QueryTypes } = require("sequelize");
 const Category = require("./models/Category");
 // command line used to generate models imported here:
-// node_modules/.bin/sequelize-auto -o "./models" -d pomo_rex -h localhost -u postgres -p 5433 -x postgres -e postgres --caseFile p --caseModel p --caseProp c
+// node_modules/.bin/sequelize-auto -o "./models" -d pomo_rex -h localhost -u postgres -p 5433 -x postgres -e postgres --indentation 4 --caseFile p --caseModel p --caseProp c
 const initModels = require("./models/init-models");
 
 class PomoRepository {
