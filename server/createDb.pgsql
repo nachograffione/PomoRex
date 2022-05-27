@@ -18,19 +18,19 @@ CREATE TABLE group_of_cats (
     CONSTRAINT ak_group_of_cats                    UNIQUE (name)
 );
 
-CREATE TABLE cat_gr (
+CREATE TABLE category_group_of_cats (
     cat_id     INT NOT NULL,
     gr_id      INT NOT NULL,
 
-    CONSTRAINT fk_cat_gr_category  FOREIGN KEY (cat_id)
+    CONSTRAINT fk_category_group_of_cats_category  FOREIGN KEY (cat_id)
         REFERENCES category (id),
-    CONSTRAINT fk_cat_gr_group_of_cats  FOREIGN KEY (gr_id)
+    CONSTRAINT fk_category_group_of_cats_group_of_cats  FOREIGN KEY (gr_id)
         REFERENCES group_of_cats (id)
 );
-CREATE INDEX index_fk_cat_gr_category
-    ON cat_gr (cat_id);
-CREATE INDEX index_fk_cat_gr_group_of_cats
-    ON cat_gr (gr_id);
+CREATE INDEX index_fk_category_group_of_cats_category
+    ON category_group_of_cats (cat_id);
+CREATE INDEX index_fk_category_group_of_cats_group_of_cats
+    ON category_group_of_cats (gr_id);
 
 
 CREATE TABLE pomo (

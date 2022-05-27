@@ -37,27 +37,27 @@ INSERT INTO group_of_cats
     VALUES (DEFAULT, 'Ingeniería');
 
 -- Assignments
-INSERT INTO cat_gr
+INSERT INTO category_group_of_cats
     VALUES ((SELECT id FROM category WHERE name = 'Estudio facultad'),
             (SELECT id FROM group_of_cats
          WHERE name = 'Facultad'));
-INSERT INTO cat_gr
+INSERT INTO category_group_of_cats
     VALUES ((SELECT id FROM category WHERE name = 'TPs, Otros de facultad'),
             (SELECT id FROM group_of_cats
          WHERE name = 'Facultad'));
-INSERT INTO cat_gr
+INSERT INTO category_group_of_cats
     VALUES ((SELECT id FROM category WHERE name = 'Clases música'),
             (SELECT id FROM group_of_cats
          WHERE name = 'Música'));
-INSERT INTO cat_gr
+INSERT INTO category_group_of_cats
     VALUES ((SELECT id FROM category WHERE name = 'Ejercitar, tocar, componer, etc.'),
             (SELECT id FROM group_of_cats
          WHERE name = 'Música'));
-INSERT INTO cat_gr
+INSERT INTO category_group_of_cats
     VALUES ((SELECT id FROM category WHERE name = 'Clases ingeniería'),
             (SELECT id FROM group_of_cats
          WHERE name = 'Ingeniería'));
-INSERT INTO cat_gr
+INSERT INTO category_group_of_cats
     VALUES ((SELECT id FROM category WHERE name = 'Trabajo programación'),
             (SELECT id FROM group_of_cats
          WHERE name = 'Ingeniería'));

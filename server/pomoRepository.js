@@ -40,7 +40,7 @@ class PomoRepository {
         // groups is a list of ids
 
         let query = "SELECT * FROM category WHERE \
-                        id IN (SELECT cat_id FROM cat_gr WHERE \
+                        id IN (SELECT cat_id FROM category_group_of_cats WHERE \
                                     gr_id IN (:groups))";
         let replacements = {};
 

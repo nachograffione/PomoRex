@@ -1,4 +1,4 @@
 ﻿DELETE FROM pomo;
-DELETE FROM cat_gr;
+DELETE FROM category_group_of_cats;
 DELETE FROM group_of_cats;
 DELETE FROM category;
