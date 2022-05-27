@@ -23,9 +23,9 @@ CREATE TABLE category_group_of_cats (
     gr_id      INT NOT NULL,
 
     CONSTRAINT fk_category_group_of_cats_category  FOREIGN KEY (cat_id)
-        REFERENCES category (id),
+        REFERENCES category (id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_category_group_of_cats_group_of_cats  FOREIGN KEY (gr_id)
-        REFERENCES group_of_cats (id)
+        REFERENCES group_of_cats (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE INDEX index_fk_category_group_of_cats_category
     ON category_group_of_cats (cat_id);
@@ -40,7 +40,7 @@ CREATE TABLE pomo (
 
     CONSTRAINT pk_pomo              PRIMARY KEY (id),
     CONSTRAINT fk_pomo_category  FOREIGN KEY (cat_id)
-        REFERENCES category (id)
+        REFERENCES category (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE INDEX index_fk_pomo_category
     ON pomo(cat_id);
