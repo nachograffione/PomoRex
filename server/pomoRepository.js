@@ -28,12 +28,44 @@ class PomoRepository {
     }
 
     async getGroups() {
-        return await this.sequelize.query(
+        let groups = await this.sequelize.query(
             "SELECT * FROM group_of_cats",
             {
                 type: QueryTypes.SELECT
+            });
+        // Add category ids
+        for (const group of groups) {
+            group.categories = await this.getCategoriesIdsOfGroup(group.id);
+        }
+        return groups;
+    }
+
+    async getGroup(id) {
+        let group = (await this.sequelize.query(
+            "SELECT * FROM group_of_cats WHERE \
+                id = :id",
+            {
+                replacements: {
+                    id: id
+                },
+                type: QueryTypes.SELECT
             }
-        );
+        ))[0];
+        // Add category ids
+        group.categories = await this.getCategoriesIdsOfGroup(group.id);
+        return group;
+    }
+
+    async getCategoriesIdsOfGroup(groupId) {
+        return (await this.sequelize.query(
+            "SELECT cat_id AS \"catId\" FROM category_group_of_cats \
+                WHERE gr_id = :groupId",
+            {
+                replacements: {
+                    groupId: groupId
+                },
+                type: QueryTypes.SELECT
+            })).map(category => category.catId);
     }
 
     async getCategories(groups = undefined) {

@@ -53,6 +53,18 @@ app.get("/api/categories/:id", async (req, res, next) => {
         category: (await pomoRepository.getCategory(parseInt(req.params.id)))[0]
     });
 });
+app.get("/api/groups", async (req, res, next) => {
+    // no params
+    res.send({
+        groups: await pomoRepository.getGroups()
+    });
+});
+app.get("/api/groups/:id", async (req, res, next) => {
+    // params: req.params.id
+    res.send({
+        group: await pomoRepository.getGroup(parseInt(req.params.id))
+    });
+});
 app.get("/api/pomos", async (req, res, next) => {
     // params: req.query.categories, req.query.dateFrom, req.query.dateTo, req.query.lastAmount
 
