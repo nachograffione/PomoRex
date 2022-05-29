@@ -94,7 +94,7 @@ class PomoRepository {
     }
 
     async getCategory(id) {
-        return await this.sequelize.query(
+        return (await this.sequelize.query(
             "SELECT * FROM category WHERE \
                 id = :id",
             {
@@ -103,7 +103,7 @@ class PomoRepository {
                 },
                 type: QueryTypes.SELECT
             }
-        );
+        ))[0];
     }
 
     async getPomos(categories = undefined, dateFrom = undefined, dateTo = undefined, lastAmount = undefined) {
@@ -139,7 +139,7 @@ class PomoRepository {
     }
 
     async getPomo(id) {
-        return await this.sequelize.query(
+        return (await this.sequelize.query(
             "SELECT id, datetime, cat_id AS \"catId\" FROM pomo WHERE \
                 id = :id",
             {
@@ -148,7 +148,7 @@ class PomoRepository {
                 },
                 type: QueryTypes.SELECT
             }
-        );
+        ))[0];
     }
 
     async getPomosQuantities(categories = undefined, dateFrom = undefined, dateTo = undefined) {
