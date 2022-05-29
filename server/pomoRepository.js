@@ -2,7 +2,12 @@ const { Sequelize, DataTypes, QueryTypes } = require("sequelize");
 const Category = require("./models/Category");
 // command line used to generate models imported here:
 // node_modules/.bin/sequelize-auto -o "./models" -d pomo_rex -h localhost -u postgres -p 5433 -x postgres -e postgres --indentation 4 --caseFile p --caseModel p --caseProp c
-const initModels = require("./models/init-models");
+// then paste this in init-models to fix the associations:
+//  Category.belongsToMany(GroupOfCats, { as: "groups", through: "categoryGroupOfCats", foreignKey: "grId" });
+//  GroupOfCats.belongsToMany(Category, { as: "categories", through: "categoryGroupOfCats", foreignKey: "catId" });
+//  Pomo.belongsTo(Category, { as: "category", foreignKey: "catId" });
+//  Category.hasMany(Pomo, { as: "pomos", foreignKey: "catId" });
+//  const initModels = require("./models/init-models");
 
 class PomoRepository {
     constructor() {
