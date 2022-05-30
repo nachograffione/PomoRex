@@ -22,6 +22,7 @@ CREATE TABLE category_group_of_cats (
     cat_id     INT NOT NULL,
     gr_id      INT NOT NULL,
 
+    CONSTRAINT pk_category_group_of_cats      PRIMARY KEY (cat_id, gr_id),
     CONSTRAINT fk_category_group_of_cats_category  FOREIGN KEY (cat_id)
         REFERENCES category (id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_category_group_of_cats_group_of_cats  FOREIGN KEY (gr_id)
