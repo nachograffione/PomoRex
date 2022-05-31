@@ -1,13 +1,15 @@
 const { Sequelize, DataTypes, QueryTypes } = require("sequelize");
-const Category = require("./models/Category");
-// command line used to generate models imported here:
-// node_modules/.bin/sequelize-auto -o "./models" -d pomo_rex -h localhost -u postgres -p 5433 -x postgres -e postgres --indentation 4 --caseFile p --caseModel p --caseProp c
-// then paste this in init-models to fix the associations:
-//  Category.belongsToMany(GroupOfCats, { as: "groups", through: "categoryGroupOfCats", foreignKey: "grId" });
-//  GroupOfCats.belongsToMany(Category, { as: "categories", through: "categoryGroupOfCats", foreignKey: "catId" });
-//  Pomo.belongsTo(Category, { as: "category", foreignKey: "catId" });
-//  Category.hasMany(Pomo, { as: "pomos", foreignKey: "catId" });
-//  const initModels = require("./models/init-models");
+const initModels = require("./models/init-models");
+
+// To generate models:
+//  Run this command from the terminal:
+//      node_modules/.bin/sequelize-auto -o "./models" -d pomo_rex -h localhost -u postgres -p 5433 -x postgres -e postgres --indentation 4 --caseFile p --caseModel p --caseProp c
+//  Paste this in recently created init-models to fix the associations:
+//      Category.belongsToMany(GroupOfCats, { as: "groups", through: CategoryGroupOfCats, foreignKey: "catId" });   // foreignKey is for the source model
+//      GroupOfCats.belongsToMany(Category, { as: "categories", through: CategoryGroupOfCats, foreignKey: "grId" });    // foreignKey is for the source model
+//      Pomo.belongsTo(Category, { as: "category", foreignKey: "catId" });
+//      Category.hasMany(Pomo, { as: "pomos", foreignKey: "catId" });
+
 
 class PomoRepository {
     constructor() {
@@ -15,7 +17,7 @@ class PomoRepository {
         this.sequelize = new Sequelize(
             "postgres://postgres:postgres@localhost:5433/pomo_rex",
             {
-                timestamps: true,
+                timestamps: false,
                 define: {
                     freezeTableName: true
                 },

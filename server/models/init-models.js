@@ -10,8 +10,8 @@ function initModels(sequelize) {
     var GroupOfCats = _GroupOfCats(sequelize, DataTypes);
     var Pomo = _Pomo(sequelize, DataTypes);
 
-    Category.belongsToMany(GroupOfCats, { as: "groups", through: "categoryGroupOfCats", foreignKey: "grId" });
-    GroupOfCats.belongsToMany(Category, { as: "categories", through: "categoryGroupOfCats", foreignKey: "catId" });
+    Category.belongsToMany(GroupOfCats, { as: "groups", through: CategoryGroupOfCats, foreignKey: "catId" });   // foreignKey is for the source model
+    GroupOfCats.belongsToMany(Category, { as: "categories", through: CategoryGroupOfCats, foreignKey: "grId" });    // foreignKey is for the source model
     Pomo.belongsTo(Category, { as: "category", foreignKey: "catId" });
     Category.hasMany(Pomo, { as: "pomos", foreignKey: "catId" });
 
