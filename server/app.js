@@ -137,6 +137,13 @@ app.patch("/api/categories/:id", async (req, res, next) => {
         updatedCategory: await pomoRepository.updateCategory(parseInt(req.params.id), req.body.newName)
     });
 });
+app.patch("/api/groups/:id", async (req, res, next) => {
+    // params: req.params.id, req.body.newName, req.body.newCategories
+    const newCategories = parseIdArrayFromQueryString(req.body.newCategories);
+    res.send({
+        updatedGroup: await pomoRepository.updateGroup(parseInt(req.params.id), req.body.newName, newCategories)
+    });
+});
 app.patch("/api/pomos/:id", async (req, res, next) => {
     // params: req.params.id, req.body.newDatetime, req.body.newCatId
     res.send({

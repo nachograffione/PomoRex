@@ -332,6 +332,36 @@ class PomoRepository {
         return category;
     }
 
+    async updateGroup(id, newName, newCategories) {
+        // All categories need to already exist
+
+        let group = undefined;
+        if (newName != undefined || newCategories != undefined) {
+            group = await this.models.GroupOfCats.findByPk(id);
+            if (newName != undefined) group.name = newName;
+            if (newCategories != undefined) {
+                // clean old associations
+                group.setCategories(null);
+                // add the associations with the existing categories
+                for (const catId of newCategories) {
+                    const cat = await this.models.Category.findByPk(catId)
+                    await group.addCategory(cat);
+                }
+            }
+            await group.save();
+        }
+        // create the object to return if applies
+        if (group != undefined) {
+            const newGroupObj = {
+                id: group.id,
+                name: group.name,
+                categories: await this.getCategoriesIdsOfGroup(group.id)
+            }
+            return newGroupObj;
+        }
+        else return group;
+    }
+
     async updatePomo(id, newDatetime, newCatId) {
         let pomo = undefined;
         if (newDatetime != undefined || newCatId != undefined) {
