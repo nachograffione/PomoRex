@@ -296,6 +296,27 @@ class PomoRepository {
         return await this.models.Category.create({ name: name });
     }
 
+    async insertGroup(name, categories) {
+        // All categories need to already exist
+
+        // build and persist the new Group
+        const newGroup = await this.models.GroupOfCats.create({ name: name });
+
+        // add the associations with the existing categories
+        for (const catId of categories) {
+            const cat = await this.models.Category.findByPk(catId)
+            await newGroup.addCategory(cat);
+        }
+
+        // create the object to return
+        const newGroupObj = {
+            id: newGroup.id,
+            name: newGroup.name,
+            categories: categories
+        }
+        return newGroupObj;
+    }
+
     async insertPomo(datetime, catId) {
         // build and persist the new Pomo
         return await this.models.Pomo.create({ datetime: datetime, catId: catId });;

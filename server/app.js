@@ -117,6 +117,13 @@ app.post("/api/categories", async (req, res, next) => {
         insertedCategory: await pomoRepository.insertCategory(req.body.name)
     });
 });
+app.post("/api/groups", async (req, res, next) => {
+    // params: req.body.name, req.body.categories
+    const categories = parseIdArrayFromQueryString(req.body.categories);
+    res.send({
+        insertedGroup: await pomoRepository.insertGroup(req.body.name, categories)
+    });
+});
 app.post("/api/pomos", async (req, res, next) => {
     // params: req.body.datetime, req.body.catId
     res.send({
