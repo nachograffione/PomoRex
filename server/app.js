@@ -157,6 +157,12 @@ app.delete("/api/categories/:id", async (req, res, next) => {
         deletedCategory: await pomoRepository.deleteCategory(parseInt(req.params.id))
     });
 });
+app.delete("/api/groups/:id", async (req, res, next) => {
+    // params: req.params.id
+    res.send({
+        deletedGroup: await pomoRepository.deleteGroup(parseInt(req.params.id))
+    });
+});
 app.delete("/api/pomos/:id", async (req, res, next) => {
     // params: req.params.id
     res.send({

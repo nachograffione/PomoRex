@@ -379,6 +379,25 @@ class PomoRepository {
         return category;
     }
 
+    async deleteGroup(id) {
+        const group = await this.models.GroupOfCats.findByPk(id);
+
+        // create the object to return if applies
+        if (group != undefined) {
+            const deletedGroupObj = {
+                id: group.id,
+                name: group.name,
+                categories: await this.getCategoriesIdsOfGroup(group.id)
+            }
+
+            // after get the data, destroy it
+            await group.destroy();
+
+            return deletedGroupObj;
+        }
+        else return group;
+    }
+
     async deletePomo(id) {
         const pomo = await this.models.Pomo.findByPk(id);
         await pomo.destroy();
