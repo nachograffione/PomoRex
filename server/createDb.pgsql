@@ -1,84 +1,47 @@
-﻿-- CREATE DATABASE pomoRex;
+﻿-- CREATE DATABASE pomo_rex;
 
 
 CREATE TABLE category (
-    catId      SERIAL,     -- == INT NOT NULL
-	catName    CHAR(40) NOT NULL,
+    id      SERIAL,     -- == INT NOT NULL
+	name    VARCHAR(40) NOT NULL,
 
-    CONSTRAINT pk_category      PRIMARY KEY (catId),
-    CONSTRAINT ak_category      UNIQUE (catName)
+    CONSTRAINT pk_category      PRIMARY KEY (id),
+    CONSTRAINT ak_category      UNIQUE (name)
 );
 
+-- I have to name like this because i cant't use group, set, class or type
+CREATE TABLE group_of_cats (
+    id          SERIAL,     -- == INT NOT NULL
+	name        VARCHAR(40) NOT NULL,
 
-CREATE TABLE subcategory (
-    subcId          SERIAL,     -- == INT NOT NULL
-	subcName        CHAR(40) NOT NULL,
-    subcIdCategory  INT NOT NULL,
-
-    CONSTRAINT pk_subcategory              PRIMARY KEY (subcId),
-    CONSTRAINT ak_subcategory              UNIQUE (subcName, subcIdCategory),
-    CONSTRAINT fk_subsubcategory_category  FOREIGN KEY (subcIdCategory)
-        REFERENCES category (catId)
+    CONSTRAINT pk_group_of_cats                    PRIMARY KEY (id),
+    CONSTRAINT ak_group_of_cats                    UNIQUE (name)
 );
-CREATE INDEX index_fk_subcategory_category
-    ON subcategory(subcIdCategory);
+
+CREATE TABLE category_group_of_cats (
+    cat_id     INT NOT NULL,
+    gr_id      INT NOT NULL,
+
+    CONSTRAINT pk_category_group_of_cats      PRIMARY KEY (cat_id, gr_id),
+    CONSTRAINT fk_category_group_of_cats_category  FOREIGN KEY (cat_id)
+        REFERENCES category (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_category_group_of_cats_group_of_cats  FOREIGN KEY (gr_id)
+        REFERENCES group_of_cats (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE INDEX index_fk_category_group_of_cats_category
+    ON category_group_of_cats (cat_id);
+CREATE INDEX index_fk_category_group_of_cats_group_of_cats
+    ON category_group_of_cats (gr_id);
 
 
 CREATE TABLE pomo (
-    pomId              SERIAL,     -- == INT NOT NULL
-	pomDate            DATE NOT NULL,
-    pomIdCategory      INT NOT NULL,
-    pomIdSubcategory   INT NULL,
+    id              SERIAL,     -- == INT NOT NULL
+	datetime        TIMESTAMPTZ NOT NULL,
+    cat_id           INT NOT NULL,
 
-    CONSTRAINT pk_pomo              PRIMARY KEY (pomId),
-    CONSTRAINT fk_pomo_category  FOREIGN KEY (pomIdCategory)
-        REFERENCES category (catId),
-    CONSTRAINT fk_pomo_subcategory  FOREIGN KEY (pomIdSubcategory)
-        REFERENCES subcategory (subcId)
+    CONSTRAINT pk_pomo              PRIMARY KEY (id),
+    CONSTRAINT fk_pomo_category  FOREIGN KEY (cat_id)
+        REFERENCES category (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE INDEX index_fk_pomo_category
-    ON pomo(pomIdCategory);
-CREATE INDEX index_fk_pomo_subcategory
-    ON pomo(pomIdSubcategory);
-
-
-CREATE OR REPLACE FUNCTION chk_pomo
-	()
-	RETURNS TRIGGER
-	LANGUAGE plpgsql
-	AS
-	$$
-	BEGIN
-	-- These are implications translated to conjunctions by theorems and logic operations
-		
-		-- The pomo's category is referred by one or more subcategories
-		-- if and only if the subcategory is not null
-        IF (NEW.pomIdCategory IN (SELECT subcIdCategory FROM subcategory) AND
-                NOT (NEW.pomIdSubcategory IS NOT NULL))
-			OR
-		   (NOT (NEW.pomIdCategory IN (SELECT subcIdCategory FROM subcategory)) AND
-                 NEW.pomIdSubcategory IS NOT NULL) THEN
-			RAISE NOTICE 'Insert/Update failed. Broken rule: The pomo''s category is referred by one or more subcategories if and only if the subcategory is not null.';
-            RETURN NULL;
-		-- If the pomo's subcategory is not null,
-		-- then it belongs to the category
-        ELSIF (NEW.pomIdSubcategory IS NOT NULL AND
-                	NOT (NEW.pomIdCategory = (SELECT subcIdCategory
-                                        		FROM subcategory
-                                        		WHERE subcId = NEW.pomIdSubcategory))) THEN
-            RAISE NOTICE 'Insert/Update failed. Broken rule: If the pomo''s subcategory is not null, then it belongs to the category.';
-            RETURN NULL;
-        ELSE
-			RETURN NEW;
-        END IF;
-	END;
-	$$;
-
-
-CREATE TRIGGER trg_pomo_ins_upd
-	BEFORE
-		INSERT OR
-        UPDATE OF pomIdCategory, pomIdSubcategory
-    ON pomo
-	FOR EACH ROW
-		EXECUTE PROCEDURE chk_pomo();
+    ON pomo(cat_id);

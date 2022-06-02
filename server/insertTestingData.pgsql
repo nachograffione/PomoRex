@@ -1,62 +1,132 @@
-﻿-----------------------------------------------------------------
--- Categories and Subcategories
+﻿-- Categories and groups
+-- Criteria:
+--      grouped cats, ungrouped cats
 
--- Cases:
---     1) A category with different subcategories from the others
---     2) Two categories with some same subcategories than others
---     3) A category without subcategories
+-- Data:
+-- Categories:                             Groups:
+-- Estudio facultad                        Facultad
+-- TPs, Otros de facultad                  Facultad
+-- Clases música                           Música
+-- Ejercitar, tocar, componer, etc.        Música
+-- Clases ingeniería                       Ingeniería
+-- Trabajo programación                    Ingeniería
+-- Otros                                   -
 
--- Case 1
+-- Categories
 INSERT INTO category
-    VALUES (DEFAULT, 'Facultad');
-INSERT INTO subcategory
-    VALUES (DEFAULT, 'Estudio',
-        (SELECT catId FROM category WHERE catName = 'Facultad'));
-INSERT INTO subcategory
-    VALUES (DEFAULT, 'TPs, Otros',
-        (SELECT catId FROM category WHERE catName = 'Facultad'));
-
--- Case 2
+    VALUES (DEFAULT, 'Estudio facultad');
 INSERT INTO category
-    VALUES (DEFAULT, 'Música');
-INSERT INTO subcategory
-    VALUES (DEFAULT, 'Clases',
-        (SELECT catId FROM category WHERE catName = 'Música'));
-INSERT INTO subcategory
-    VALUES (DEFAULT, 'Ejercitar, tocar, componer, etc.',
-        (SELECT catId FROM category WHERE catName = 'Música'));
-
+    VALUES (DEFAULT, 'TPs, Otros de facultad');
 INSERT INTO category
-    VALUES (DEFAULT, 'Ingeniería');
-INSERT INTO subcategory
-    VALUES (DEFAULT, 'Clases',
-        (SELECT catId FROM category WHERE catName = 'Ingeniería'));
-INSERT INTO subcategory
-    VALUES (DEFAULT, 'Trabajo',
-        (SELECT catId FROM category WHERE catName = 'Ingeniería'));
-
--- Case 3
+    VALUES (DEFAULT, 'Clases música');
+INSERT INTO category
+    VALUES (DEFAULT, 'Ejercitar, tocar, componer, etc.');
+INSERT INTO category
+    VALUES (DEFAULT, 'Clases ingeniería');
+INSERT INTO category
+    VALUES (DEFAULT, 'Trabajo programación');
 INSERT INTO category
     VALUES (DEFAULT, 'Otros');
 
------------------------------------------------------------------
+-- Groups
+INSERT INTO group_of_cats
+    VALUES (DEFAULT, 'Facultad');
+INSERT INTO group_of_cats
+    VALUES (DEFAULT, 'Música');
+INSERT INTO group_of_cats
+    VALUES (DEFAULT, 'Ingeniería');
+
+-- Assignments
+INSERT INTO category_group_of_cats
+    VALUES ((SELECT id FROM category WHERE name = 'Estudio facultad'),
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Facultad'));
+INSERT INTO category_group_of_cats
+    VALUES ((SELECT id FROM category WHERE name = 'TPs, Otros de facultad'),
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Facultad'));
+INSERT INTO category_group_of_cats
+    VALUES ((SELECT id FROM category WHERE name = 'Clases música'),
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Música'));
+INSERT INTO category_group_of_cats
+    VALUES ((SELECT id FROM category WHERE name = 'Ejercitar, tocar, componer, etc.'),
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Música'));
+INSERT INTO category_group_of_cats
+    VALUES ((SELECT id FROM category WHERE name = 'Clases ingeniería'),
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Ingeniería'));
+INSERT INTO category_group_of_cats
+    VALUES ((SELECT id FROM category WHERE name = 'Trabajo programación'),
+            (SELECT id FROM group_of_cats
+         WHERE name = 'Ingeniería'));
+
 -- Pomos
+-- Criteria:
+--      days with repeated pomos, unrepeated pomos, combinations of them, different hours (including time endpoints), different cats and groups
 
--- Cases:
---     1) A pomo with category and subcategory
---     2) A pomo with only category
+-- Data:
+-- 2022-03-04
+--     4 Trabajo programación
+--     3 Estudio facultad
+-- 2022-03-03
+--     0
+-- 2022-03-02
+--     1 Ejercitar, tocar, componer, etc.
+--     1 Otros
+-- 2022-03-01
+--     2 Estudio facultad
+--     1 Clases música
 
--- Case 1
+
 INSERT INTO pomo
-    VALUES (DEFAULT, '2022/03/01',
-            (SELECT catId FROM category
-                WHERE catName = 'Ingeniería'),
-            (SELECT subcId FROM subcategory
-                WHERE subcIdCategory = (SELECT catId FROM category
-                                        WHERE catName = 'Ingeniería') AND
-                subcName = 'Clases'));
-
--- Case 2
+    VALUES (DEFAULT, '2022-03-01 00:00:00.000 -03:00', -- first time endpoint
+            (SELECT id FROM category
+                WHERE name = 'Estudio facultad'));
 INSERT INTO pomo
-    VALUES (DEFAULT, '2022/03/01',
-        (SELECT catId FROM category WHERE catName = 'Otros'));
+    VALUES (DEFAULT, '2022-03-01 10:30:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Estudio facultad'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-01 11:15:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Clases música'));
+
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-02 16:00:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Ejercitar, tocar, componer, etc.'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-02 12:00:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Otros'));
+
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 17:00:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Trabajo programación'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 16:45:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Trabajo programación'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 16:50:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Trabajo programación'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 16:50:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Trabajo programación'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 16:51:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Estudio facultad'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 17:15:00.000 -03:00',
+            (SELECT id FROM category
+                WHERE name = 'Estudio facultad'));
+INSERT INTO pomo
+    VALUES (DEFAULT, '2022-03-04 23:59:59.999 -03:00',  -- last time endpoint
+            (SELECT id FROM category
+                WHERE name = 'Estudio facultad'));
