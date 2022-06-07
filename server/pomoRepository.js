@@ -304,17 +304,16 @@ class PomoRepository {
 
         // add the associations with the existing categories
         for (const catId of categories) {
-            const category = await this.models.Category.findByPk(catId)
+            const category = await this.models.Category.findByPk(catId);
             await newGroup.addCategory(category);
         }
 
         // create the object to return
-        const newGroupObj = {
+        return {
             id: newGroup.id,
             name: newGroup.name,
             categories: categories
-        }
-        return newGroupObj;
+        };
     }
 
     async insertPomo(datetime, catId) {
@@ -352,12 +351,11 @@ class PomoRepository {
         }
         // create the object to return if applies
         if (group != undefined) {
-            const newGroupObj = {
+            return {
                 id: group.id,
                 name: group.name,
                 categories: await this.getCategoriesIdsOfGroup(group.id)
-            }
-            return newGroupObj;
+            };
         }
         else return group;
     }
