@@ -304,8 +304,8 @@ class PomoRepository {
 
         // add the associations with the existing categories
         for (const catId of categories) {
-            const cat = await this.models.Category.findByPk(catId)
-            await newGroup.addCategory(cat);
+            const category = await this.models.Category.findByPk(catId)
+            await newGroup.addCategory(category);
         }
 
         // create the object to return
@@ -344,8 +344,8 @@ class PomoRepository {
                 group.setCategories(null);
                 // add the associations with the existing categories
                 for (const catId of newCategories) {
-                    const cat = await this.models.Category.findByPk(catId)
-                    await group.addCategory(cat);
+                    const category = await this.models.Category.findByPk(catId)
+                    await group.addCategory(category);
                 }
             }
             await group.save();
