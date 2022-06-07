@@ -1,9 +1,15 @@
-// imports
-//      ejs is required in set EJS section implicitly
+// IMPORTS ---------------------------------------------------------------------
+
+// ejs is required in set EJS section implicitly
 const path = require("path");
 const express = require("express");
 const { PomoRepository } = require("./pomoRepository");
-// params
+
+
+
+
+// GLOBAL CONSTANTS, SET UP ----------------------------------------------------
+
 const port = 3000;
 
 // instantiate PomoRepository
@@ -19,11 +25,16 @@ app.listen(port, () => {
 app.set("view engine", "ejs");  //it will do require("ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// routing
-//      general
+
+
+
+// ROUTING ---------------------------------------------------------------------
+
+// -- General --
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "static/")));
-//      pages
+
+// -- Pages --
 app.get("/insert", (req, res, next) => {
     res.render("insertOrEditLast.ejs", { editLast: false });
 });
@@ -36,8 +47,12 @@ app.get("/editLast", (req, res, next) => {
 app.get("/control", (req, res, next) => {
     res.render("control.ejs");
 });
-// api
-//      get
+
+// -- Api --
+
+//      -- Routes for "GET" --
+
+//          -- Categories --
 app.get("/api/categories", async (req, res, next) => {
     // params: req.query.groups
 
@@ -53,6 +68,8 @@ app.get("/api/categories/:id", async (req, res, next) => {
         category: await pomoRepository.getCategory(parseInt(req.params.id))
     });
 });
+
+//          -- Groups --
 app.get("/api/groups", async (req, res, next) => {
     // no params
     res.send({
@@ -65,6 +82,8 @@ app.get("/api/groups/:id", async (req, res, next) => {
         group: await pomoRepository.getGroup(parseInt(req.params.id))
     });
 });
+
+//          -- Pomos --
 app.get("/api/pomos", async (req, res, next) => {
     // params: req.query.categories, req.query.dateFrom, req.query.dateTo, req.query.lastAmount
 
@@ -88,6 +107,8 @@ app.get("/api/pomos/:id", async (req, res, next) => {
         pomo: await pomoRepository.getPomo(parseInt(req.params.id))
     });
 });
+
+//          -- Aggregations --
 app.get("/api/aggregations/pomos-quantities", async (req, res, next) => {
     // params: req.query.categories, req.query.dateFrom, req.query.dateTo
 
@@ -110,7 +131,8 @@ app.get("/api/aggregations/pomos-averages", async (req, res, next) => {
         pomosAverages: await pomoRepository.getPomosAverages(categories, req.query.dateFrom, req.query.dateTo)
     });
 });
-//      post
+
+//      -- Routes for "POST" --
 app.post("/api/categories", async (req, res, next) => {
     // params: req.body.name
     res.send({
@@ -130,7 +152,8 @@ app.post("/api/pomos", async (req, res, next) => {
         insertedPomo: await pomoRepository.insertPomo(req.body.datetime, req.body.catId)
     });
 });
-//      patch
+
+//      -- Routes for "PATCH" --
 app.patch("/api/categories/:id", async (req, res, next) => {
     // params: req.params.id, req.body.newName
     res.send({
@@ -150,7 +173,8 @@ app.patch("/api/pomos/:id", async (req, res, next) => {
         updatedPomo: await pomoRepository.updatePomo(parseInt(req.params.id), req.body.newDatetime, req.body.newCatId)
     });
 });
-//      delete
+
+//      -- Routes for "DELETE" --
 app.delete("/api/categories/:id", async (req, res, next) => {
     // params: req.params.id
     res.send({
@@ -169,6 +193,11 @@ app.delete("/api/pomos/:id", async (req, res, next) => {
         deletedPomo: await pomoRepository.deletePomo(parseInt(req.params.id))
     });
 });
+
+
+
+
+// AUX METHODS -----------------------------------------------------------------
 
 function parseIdArrayFromQueryString(queryArray) {
     // useful for either groups and categories
