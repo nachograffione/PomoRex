@@ -119,12 +119,12 @@ class PomoRepository {
     //      -- Pomos --
     async getPomos(categories = undefined, dateFrom = undefined, dateTo = undefined, lastAmount = undefined) {
         // Expected date format: "YYYY-MM-DD"
-        // It returns those pomos that match with the categories and are into the half-bounded date interval [dateFrom, dateTo)
+        // It returns those pomos that match with the categories and are into the date interval [dateFrom, dateTo]
 
         // since ALL is not a value but a reserved word, it needs to be added as plain text, it can't be added through sequelize replacements
         let query = "SELECT id, datetime, cat_id AS \"catId\" FROM pomo WHERE \
                         date(datetime) >= :dateFrom \
-                        AND date(datetime) < :dateTo \
+                        AND date(datetime) <= :dateTo \
                         AND cat_id IN (:categories) \
                         ORDER BY datetime DESC \
                         LIMIT :lastAmount";
@@ -166,7 +166,7 @@ class PomoRepository {
     async getPomosQuantities(categories = undefined, dateFrom = undefined, dateTo = undefined) {
         // Expected date format: "YYYY-MM-DD"
         // It returns a list of objects representing each day and their quantities by category,
-        // including those pomos that match with the categories and are into the half-bounded date interval [dateFrom, dateTo)
+        // including those pomos that match with the categories and are into the date interval [dateFrom, dateTo]
 
         // Return format:
         // [
@@ -231,7 +231,7 @@ class PomoRepository {
     async getPomosAverages(categories = undefined, dateFrom = undefined, dateTo = undefined) {
         // Expected date format: "YYYY-MM-DD"
         // It returns a list of objects with the average for each category (dividing by week days)
-        // including those pomos that match with the categories and are into the half-bounded date interval [dateFrom, dateTo)
+        // including those pomos that match with the categories and are into the date interval [dateFrom, dateTo]
 
         // Return format:
         // [
@@ -254,7 +254,7 @@ class PomoRepository {
                                                             WHERE EXTRACT(isodow FROM generate_series) NOT IN(6, 7))::REAL AS average \
                 FROM category LEFT JOIN(SELECT * FROM pomo \
                                             WHERE date(datetime) >= :dateFrom \
-                                            AND date(datetime) < :dateTo) AS pomos \
+                                            AND date(datetime) <= :dateTo) AS pomos \
                     ON cat_id = category.id \
                 WHERE category.id IN(:categories) \
                 GROUP BY category.id \
@@ -415,7 +415,6 @@ class PomoRepository {
         // set dateTo as the next of the current date by default
         if (dateTo == undefined) {
             dateTo = new Date(); // the constructor returns current datetime by default
-            dateTo.setDate(dateTo.getDate() + 1);
             dateTo = dateTo.toISOString();
             dateTo = dateTo.slice(0, dateTo.indexOf("T")); // remove time and timezone
         }
