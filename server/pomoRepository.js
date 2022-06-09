@@ -285,7 +285,7 @@ class PomoRepository {
         return {
             id: newGroup.id,
             name: newGroup.name,
-            categories: categories
+            categories: await this.getCategoriesIdsOfGroup(group.id)
         };
     }
 
