@@ -2,7 +2,7 @@
 
 //  Run this command from the terminal:
 //      node_modules/.bin/sequelize-auto -o "./models" -d pomo_rex -h localhost -u postgres -p 5433 -x postgres -e postgres --indentation 4 --caseFile p --caseModel p --caseProp c
-//  Paste this in recently created init-models to fix the associations:
+//  Replace the generated associations in the init-models file with those:
 //      Category.belongsToMany(GroupOfCats, { as: "groups", through: CategoryGroupOfCats, foreignKey: "catId" });   // foreignKey is for the source model
 //      GroupOfCats.belongsToMany(Category, { as: "categories", through: CategoryGroupOfCats, foreignKey: "grId" });    // foreignKey is for the source model
 //      Pomo.belongsTo(Category, { as: "category", foreignKey: "catId" });
