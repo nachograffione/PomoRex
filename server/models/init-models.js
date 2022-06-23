@@ -14,7 +14,6 @@ function initModels(sequelize) {
     GroupOfCats.belongsToMany(Category, { as: "categories", through: CategoryGroupOfCats, foreignKey: "grId" });    // foreignKey is for the source model
     Pomo.belongsTo(Category, { as: "category", foreignKey: "catId" });
     Category.hasMany(Pomo, { as: "pomos", foreignKey: "catId" });
-
     return {
         Category,
         CategoryGroupOfCats,

@@ -1,17 +1,28 @@
-const { Sequelize, DataTypes, QueryTypes } = require("sequelize");
-const initModels = require("./models/init-models");
+// MODEL GENERATION ------------------------------------------------------------
 
-// To generate models:
 //  Run this command from the terminal:
 //      node_modules/.bin/sequelize-auto -o "./models" -d pomo_rex -h localhost -u postgres -p 5433 -x postgres -e postgres --indentation 4 --caseFile p --caseModel p --caseProp c
-//  Paste this in recently created init-models to fix the associations:
+//  Replace the generated associations in the init-models file with those:
 //      Category.belongsToMany(GroupOfCats, { as: "groups", through: CategoryGroupOfCats, foreignKey: "catId" });   // foreignKey is for the source model
 //      GroupOfCats.belongsToMany(Category, { as: "categories", through: CategoryGroupOfCats, foreignKey: "grId" });    // foreignKey is for the source model
 //      Pomo.belongsTo(Category, { as: "category", foreignKey: "catId" });
 //      Category.hasMany(Pomo, { as: "pomos", foreignKey: "catId" });
 
 
+
+
+// IMPORTS ---------------------------------------------------------------------
+
+const { Sequelize, DataTypes, QueryTypes } = require("sequelize");
+const initModels = require("./models/init-models");
+
+
+
+
+// MAIN CLASS ------------------------------------------------------------------
+
 class PomoRepository {
+    // -- Constructor --
     constructor() {
         // sequelize init
         this.sequelize = new Sequelize(
@@ -34,47 +45,9 @@ class PomoRepository {
         this.models = initModels(this.sequelize);
     }
 
-    async getGroups() {
-        let groups = await this.sequelize.query(
-            "SELECT * FROM group_of_cats",
-            {
-                type: QueryTypes.SELECT
-            });
-        // Add category ids
-        for (const group of groups) {
-            group.categories = await this.getCategoriesIdsOfGroup(group.id);
-        }
-        return groups;
-    }
+    // -- Get methods --
 
-    async getGroup(id) {
-        let group = (await this.sequelize.query(
-            "SELECT * FROM group_of_cats WHERE \
-                id = :id",
-            {
-                replacements: {
-                    id: id
-                },
-                type: QueryTypes.SELECT
-            }
-        ))[0];
-        // Add category ids
-        group.categories = await this.getCategoriesIdsOfGroup(group.id);
-        return group;
-    }
-
-    async getCategoriesIdsOfGroup(groupId) {
-        return (await this.sequelize.query(
-            "SELECT cat_id AS \"catId\" FROM category_group_of_cats \
-                WHERE gr_id = :groupId",
-            {
-                replacements: {
-                    groupId: groupId
-                },
-                type: QueryTypes.SELECT
-            })).map(category => category.catId);
-    }
-
+    //      -- Categories --
     async getCategories(groups = undefined) {
         // groups is a list of ids
 
@@ -95,32 +68,71 @@ class PomoRepository {
             query,
             {
                 replacements: replacements,
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                mapToModel: true,
+                model: this.models.Category
             }
         );
     }
 
     async getCategory(id) {
-        return (await this.sequelize.query(
+        return await this.sequelize.query(
             "SELECT * FROM category WHERE \
                 id = :id",
             {
                 replacements: {
                     id: id
                 },
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                plain: true,
+                mapToModel: true,
+                model: this.models.Category
             }
-        ))[0];
+        );
     }
 
+    //      -- Groups --
+    async getGroups() {
+        let groups = await this.sequelize.query(
+            "SELECT * FROM group_of_cats",
+            {
+                type: QueryTypes.SELECT,
+                mapToModel: true,
+                model: this.models.GroupOfCats
+            });
+        // Add categories ids
+        for (const group of groups) {
+            await this.addCategoriesIdsList(group);
+        }
+        return groups;
+    }
+
+    async getGroup(id) {
+        let group = await this.sequelize.query(
+            "SELECT * FROM group_of_cats WHERE \
+                id = :id",
+            {
+                replacements: {
+                    id: id
+                },
+                type: QueryTypes.SELECT,
+                plain: true
+            }
+        );
+        // Add categories ids
+        await this.addCategoriesIdsList(group);
+        return group;
+    }
+
+    //      -- Pomos --
     async getPomos(categories = undefined, dateFrom = undefined, dateTo = undefined, lastAmount = undefined) {
         // Expected date format: "YYYY-MM-DD"
-        // It returns those pomos that match with the categories and are into the half-bounded date interval [dateFrom, dateTo)
+        // It returns those pomos that match with the categories and are into the date interval [dateFrom, dateTo]
 
         // since ALL is not a value but a reserved word, it needs to be added as plain text, it can't be added through sequelize replacements
-        let query = "SELECT id, datetime, cat_id AS \"catId\" FROM pomo WHERE \
+        let query = "SELECT * FROM pomo WHERE \
                         date(datetime) >= :dateFrom \
-                        AND date(datetime) < :dateTo \
+                        AND date(datetime) <= :dateTo \
                         AND cat_id IN (:categories) \
                         ORDER BY datetime DESC \
                         LIMIT :lastAmount";
@@ -140,28 +152,36 @@ class PomoRepository {
             query,
             {
                 replacements: replacements,
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                mapToModel: true,
+                model: this.models.Pomo
             }
         );
     }
 
     async getPomo(id) {
-        return (await this.sequelize.query(
-            "SELECT id, datetime, cat_id AS \"catId\" FROM pomo WHERE \
+        return await this.sequelize.query(
+            "SELECT * FROM pomo WHERE \
                 id = :id",
             {
                 replacements: {
                     id: id
                 },
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                plain: true,
+                mapToModel: true,
+                model: this.models.Pomo
             }
-        ))[0];
+        );
     }
 
+    //      -- Pomos --
     async getPomosQuantities(categories = undefined, dateFrom = undefined, dateTo = undefined) {
         // Expected date format: "YYYY-MM-DD"
         // It returns a list of objects representing each day and their quantities by category,
-        // including those pomos that match with the categories and are into the half-bounded date interval [dateFrom, dateTo)
+        // including those pomos that match with the categories and are into the date interval [dateFrom, dateTo]
+
+        // The objects returned are not mapped but made manually
 
         // Return format:
         // [
@@ -226,7 +246,9 @@ class PomoRepository {
     async getPomosAverages(categories = undefined, dateFrom = undefined, dateTo = undefined) {
         // Expected date format: "YYYY-MM-DD"
         // It returns a list of objects with the average for each category (dividing by week days)
-        // including those pomos that match with the categories and are into the half-bounded date interval [dateFrom, dateTo)
+        // including those pomos that match with the categories and are into the date interval [dateFrom, dateTo]
+
+        // The objects returned are not mapped but made manually
 
         // Return format:
         // [
@@ -249,7 +271,7 @@ class PomoRepository {
                                                             WHERE EXTRACT(isodow FROM generate_series) NOT IN(6, 7))::REAL AS average \
                 FROM category LEFT JOIN(SELECT * FROM pomo \
                                             WHERE date(datetime) >= :dateFrom \
-                                            AND date(datetime) < :dateTo) AS pomos \
+                                            AND date(datetime) <= :dateTo) AS pomos \
                     ON cat_id = category.id \
                 WHERE category.id IN(:categories) \
                 GROUP BY category.id \
@@ -261,36 +283,7 @@ class PomoRepository {
         );
     }
 
-    async setCommonParams(categories = undefined, dateFrom = undefined, dateTo = undefined) {
-        // set categories
-        if (categories == undefined) {
-            // get all the categories' id
-            categories = await this.getCategories();
-            categories = categories.map(category => category.id);
-        }
-
-        // set dateFrom as the earliest date inserted by default
-        if (dateFrom == undefined) {
-            const queryResult = await this.sequelize.query(
-                "SELECT MIN(date(datetime)) AS \"date\" FROM pomo",
-                {
-                    type: QueryTypes.SELECT
-                }
-            );
-            dateFrom = queryResult[0].date;
-        }
-
-        // set dateTo as the next of the current date by default
-        if (dateTo == undefined) {
-            dateTo = new Date(); // the constructor returns current datetime by default
-            dateTo.setDate(dateTo.getDate() + 1);
-            dateTo = dateTo.toISOString();
-            dateTo = dateTo.slice(0, dateTo.indexOf("T")); // remove time and timezone
-        }
-
-        return [categories, dateFrom, dateTo];
-    }
-
+    // -- Insert methods --
     async insertCategory(name) {
         // build and persist the new Category
         return await this.models.Category.create({ name: name });
@@ -303,18 +296,14 @@ class PomoRepository {
         const newGroup = await this.models.GroupOfCats.create({ name: name });
 
         // add the associations with the existing categories
-        for (const catId of categories) {
-            const cat = await this.models.Category.findByPk(catId)
-            await newGroup.addCategory(cat);
-        }
+        newGroup.setCategories(categories);
 
         // create the object to return
-        const newGroupObj = {
+        return {
             id: newGroup.id,
             name: newGroup.name,
-            categories: categories
-        }
-        return newGroupObj;
+            categories: await this.getCategoriesIdsOfGroup(group.id)
+        };
     }
 
     async insertPomo(datetime, catId) {
@@ -322,6 +311,7 @@ class PomoRepository {
         return await this.models.Pomo.create({ datetime: datetime, catId: catId });;
     }
 
+    // -- Update methods --
     async updateCategory(id, newName) {
         let category = undefined;
         if (newName != undefined) {
@@ -343,21 +333,17 @@ class PomoRepository {
                 // clean old associations
                 group.setCategories(null);
                 // add the associations with the existing categories
-                for (const catId of newCategories) {
-                    const cat = await this.models.Category.findByPk(catId)
-                    await group.addCategory(cat);
-                }
+                group.setCategories(newCategories);
             }
             await group.save();
         }
         // create the object to return if applies
         if (group != undefined) {
-            const newGroupObj = {
+            return {
                 id: group.id,
                 name: group.name,
                 categories: await this.getCategoriesIdsOfGroup(group.id)
-            }
-            return newGroupObj;
+            };
         }
         else return group;
     }
@@ -373,6 +359,7 @@ class PomoRepository {
         return pomo;
     }
 
+    // -- Delete methods --
     async deleteCategory(id) {
         const category = await this.models.Category.findByPk(id);
         await category.destroy();
@@ -402,6 +389,54 @@ class PomoRepository {
         const pomo = await this.models.Pomo.findByPk(id);
         await pomo.destroy();
         return pomo;
+    }
+
+    // -- Aux methods --
+    async setCommonParams(categories = undefined, dateFrom = undefined, dateTo = undefined) {
+        // set categories
+        if (categories == undefined) {
+            // get all the categories' id
+            categories = await this.getCategories();
+            categories = categories.map(category => category.id);
+        }
+
+        // set dateFrom as the earliest date inserted by default
+        if (dateFrom == undefined) {
+            dateFrom = (await this.sequelize.query(
+                "SELECT MIN(date(datetime)) FROM pomo",
+                {
+                    type: QueryTypes.SELECT,
+                    plain: true
+                }
+            )).min; //min is the default name for MIN SQL function
+        }
+
+        // set dateTo as the current date by default
+        if (dateTo == undefined) {
+            dateTo = new Date(); // the constructor returns current datetime by default
+            dateTo = dateTo.toISOString();
+            dateTo = dateTo.slice(0, dateTo.indexOf("T")); // remove time and timezone
+        }
+
+        return [categories, dateFrom, dateTo];
+    }
+
+    async addCategoriesIdsList(group) {
+        // It modifies the group appending an attr called categories, 
+        // which holds the related categories ids
+
+        // Add category ids
+        group.categories = await (await this.sequelize.query(
+            "SELECT * FROM category_group_of_cats \
+                    WHERE gr_id = :groupId",
+            {
+                replacements: {
+                    groupId: group.id
+                },
+                type: QueryTypes.SELECT,
+                mapToModel: true,
+                model: this.models.CategoryGroupOfCats
+            })).map(categoryGroupOfCats => categoryGroupOfCats.catId);
     }
 }
 
