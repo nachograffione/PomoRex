@@ -76,7 +76,7 @@ class PomoRepository {
     }
 
     async getCategory(id) {
-        return (await this.sequelize.query(
+        return await this.sequelize.query(
             "SELECT * FROM category WHERE \
                 id = :id",
             {
@@ -84,10 +84,11 @@ class PomoRepository {
                     id: id
                 },
                 type: QueryTypes.SELECT,
+                plain: true,
                 mapToModel: true,
                 model: this.models.Category
             }
-        ))[0];
+        );
     }
 
     //      -- Groups --
@@ -107,16 +108,17 @@ class PomoRepository {
     }
 
     async getGroup(id) {
-        let group = (await this.sequelize.query(
+        let group = await this.sequelize.query(
             "SELECT * FROM group_of_cats WHERE \
                 id = :id",
             {
                 replacements: {
                     id: id
                 },
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                plain: true
             }
-        ))[0];
+        );
         // Add categories ids
         await this.addCategoriesIdsList(group);
         return group;
@@ -158,7 +160,7 @@ class PomoRepository {
     }
 
     async getPomo(id) {
-        return (await this.sequelize.query(
+        return await this.sequelize.query(
             "SELECT * FROM pomo WHERE \
                 id = :id",
             {
@@ -166,10 +168,11 @@ class PomoRepository {
                     id: id
                 },
                 type: QueryTypes.SELECT,
+                plain: true,
                 mapToModel: true,
                 model: this.models.Pomo
             }
-        ))[0];
+        );
     }
 
     //      -- Pomos --
@@ -402,9 +405,10 @@ class PomoRepository {
             dateFrom = (await this.sequelize.query(
                 "SELECT MIN(date(datetime)) FROM pomo",
                 {
-                    type: QueryTypes.SELECT
+                    type: QueryTypes.SELECT,
+                    plain: true
                 }
-            ))[0].min; //min is the default name for MIN SQL function
+            )).min; //min is the default name for MIN SQL function
         }
 
         // set dateTo as the current date by default
