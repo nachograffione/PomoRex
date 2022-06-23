@@ -68,7 +68,9 @@ class PomoRepository {
             query,
             {
                 replacements: replacements,
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                mapToModel: true,
+                model: this.models.Category
             }
         );
     }
@@ -81,7 +83,9 @@ class PomoRepository {
                 replacements: {
                     id: id
                 },
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                mapToModel: true,
+                model: this.models.Category
             }
         ))[0];
     }
@@ -91,11 +95,13 @@ class PomoRepository {
         let groups = await this.sequelize.query(
             "SELECT * FROM group_of_cats",
             {
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                mapToModel: true,
+                model: this.models.GroupOfCats
             });
-        // Add category ids
+        // Add categories ids
         for (const group of groups) {
-            group.categories = await this.getCategoriesIdsOfGroup(group.id);
+            await this.addCategoriesIdsList(group);
         }
         return groups;
     }
@@ -111,8 +117,8 @@ class PomoRepository {
                 type: QueryTypes.SELECT
             }
         ))[0];
-        // Add category ids
-        group.categories = await this.getCategoriesIdsOfGroup(group.id);
+        // Add categories ids
+        await this.addCategoriesIdsList(group);
         return group;
     }
 
@@ -122,7 +128,7 @@ class PomoRepository {
         // It returns those pomos that match with the categories and are into the date interval [dateFrom, dateTo]
 
         // since ALL is not a value but a reserved word, it needs to be added as plain text, it can't be added through sequelize replacements
-        let query = "SELECT id, datetime, cat_id AS \"catId\" FROM pomo WHERE \
+        let query = "SELECT * FROM pomo WHERE \
                         date(datetime) >= :dateFrom \
                         AND date(datetime) <= :dateTo \
                         AND cat_id IN (:categories) \
@@ -144,20 +150,24 @@ class PomoRepository {
             query,
             {
                 replacements: replacements,
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                mapToModel: true,
+                model: this.models.Pomo
             }
         );
     }
 
     async getPomo(id) {
         return (await this.sequelize.query(
-            "SELECT id, datetime, cat_id AS \"catId\" FROM pomo WHERE \
+            "SELECT * FROM pomo WHERE \
                 id = :id",
             {
                 replacements: {
                     id: id
                 },
-                type: QueryTypes.SELECT
+                type: QueryTypes.SELECT,
+                mapToModel: true,
+                model: this.models.Pomo
             }
         ))[0];
     }
@@ -167,6 +177,8 @@ class PomoRepository {
         // Expected date format: "YYYY-MM-DD"
         // It returns a list of objects representing each day and their quantities by category,
         // including those pomos that match with the categories and are into the date interval [dateFrom, dateTo]
+
+        // The objects returned are not mapped but made manually
 
         // Return format:
         // [
@@ -232,6 +244,8 @@ class PomoRepository {
         // Expected date format: "YYYY-MM-DD"
         // It returns a list of objects with the average for each category (dividing by week days)
         // including those pomos that match with the categories and are into the date interval [dateFrom, dateTo]
+
+        // The objects returned are not mapped but made manually
 
         // Return format:
         // [
@@ -375,18 +389,6 @@ class PomoRepository {
     }
 
     // -- Aux methods --
-    async getCategoriesIdsOfGroup(groupId) {
-        return (await this.sequelize.query(
-            "SELECT cat_id AS \"catId\" FROM category_group_of_cats \
-                WHERE gr_id = :groupId",
-            {
-                replacements: {
-                    groupId: groupId
-                },
-                type: QueryTypes.SELECT
-            })).map(category => category.catId);
-    }
-
     async setCommonParams(categories = undefined, dateFrom = undefined, dateTo = undefined) {
         // set categories
         if (categories == undefined) {
@@ -397,16 +399,15 @@ class PomoRepository {
 
         // set dateFrom as the earliest date inserted by default
         if (dateFrom == undefined) {
-            const queryResult = await this.sequelize.query(
-                "SELECT MIN(date(datetime)) AS \"date\" FROM pomo",
+            dateFrom = (await this.sequelize.query(
+                "SELECT MIN(date(datetime)) FROM pomo",
                 {
                     type: QueryTypes.SELECT
                 }
-            );
-            dateFrom = queryResult[0].date;
+            ))[0].min; //min is the default name for MIN SQL function
         }
 
-        // set dateTo as the next of the current date by default
+        // set dateTo as the current date by default
         if (dateTo == undefined) {
             dateTo = new Date(); // the constructor returns current datetime by default
             dateTo = dateTo.toISOString();
@@ -414,6 +415,24 @@ class PomoRepository {
         }
 
         return [categories, dateFrom, dateTo];
+    }
+
+    async addCategoriesIdsList(group) {
+        // It modifies the group appending an attr called categories, 
+        // which holds the related categories ids
+
+        // Add category ids
+        group.categories = await (await this.sequelize.query(
+            "SELECT * FROM category_group_of_cats \
+                    WHERE gr_id = :groupId",
+            {
+                replacements: {
+                    groupId: group.id
+                },
+                type: QueryTypes.SELECT,
+                mapToModel: true,
+                model: this.models.CategoryGroupOfCats
+            })).map(categoryGroupOfCats => categoryGroupOfCats.catId);
     }
 }
 
