@@ -26,7 +26,7 @@ class PomoRepository {
     constructor() {
         // sequelize init
         this.sequelize = new Sequelize(
-            "postgres://postgres:postgres@localhost:5433/pomo_rex",
+            "postgres://postgres:postgres@localhost:5432/pomo_rex",
             {
                 timestamps: false,
                 define: {
