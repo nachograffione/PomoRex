@@ -1,6 +1,6 @@
 __design/
-server/node_modules/
-server/package-lock.json
-server/package.json
-server/test.js
-server/temp.js
+node_modules/
+package-lock.json
+package.json
+test.js
+temp.js
